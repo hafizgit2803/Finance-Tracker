@@ -405,7 +405,7 @@ tfoot td{padding:8px 12px;font-weight:600;font-family:'DM Mono',monospace;font-s
       <div class="ph">
         <div><h1>Cash LC</h1><p style="color:var(--tx3);font-size:12px;margin-top:4px" id="dash-date"></p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap" class="no-print">
-          <button class="btn bpr bsm" onclick="printDashboardSummary()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:2px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Print</button>
+          <button class="btn bpr bsm" onclick="om('m-dashboard-print-choice')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:2px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Print</button>
           <button class="btn bp bsm" onclick="openAddParty()">+ Add Party</button>
         </div>
       </div>
@@ -6732,28 +6732,56 @@ function printLiability() {
 // ── Cash LC Dashboard: one-page accounting-ledger-style summary print,
 // replacing the raw window.print() of the live card grid (which produced
 // no table borders and broke apart badly across pages). ──
-function printDashboardSummary() {
+function printDashboardSummary(mode) {
   var today = new Date().toISOString().split('T')[0];
   function FDP(d){ if(!d) return ''; var p = String(d).split('T')[0].split('-'); return p[2]+'/'+p[1]+'/'+p[0].slice(2); }
 
-  var rows = ST.parties.slice().sort(function(a,b){ return String(a.name).localeCompare(String(b.name)); });
-  var grandDebit = 0, grandCredit = 0, grandBalance = 0;
+  var headHtml, bodyHtml, footHtml, titleText;
 
-  var bodyHtml = rows.map(function(p, i) {
-    var c = calc(p);
-    grandDebit += c.tdFull;
-    grandCredit += c.tc;
-    grandBalance += c.bal;
-    var typeLabel = p.ptype === 'fabric' ? 'Fabric' : 'Accessories';
-    return '<tr><td class="c">' + (i+1) + '</td>'
-      + '<td class="l b">' + (p.name||'\u2014') + '</td>'
-      + '<td class="c">' + typeLabel + '</td>'
-      + '<td class="r">' + F(c.tdFull) + '</td>'
-      + '<td class="r">' + F(c.tc) + '</td>'
-      + '<td class="r b">' + F(c.bal) + '</td></tr>';
-  }).join('');
-
-  if (!rows.length) bodyHtml = '<tr><td colspan="6" class="c" style="color:#86868b;padding:16px">No parties yet</td></tr>';
+  if (mode === 'simple') {
+    // Option 2 — combine same-named parties (Accessories + Fabric ledgers)
+    // into one row with their balances summed, just Name + Receivable.
+    titleText = 'Cash LC \u2014 Receivable Summary';
+    var byName = {};
+    var order = [];
+    ST.parties.forEach(function(p){
+      var c = calc(p);
+      if (!(p.name in byName)) { byName[p.name] = 0; order.push(p.name); }
+      byName[p.name] += c.bal;
+    });
+    order.sort(function(a,b){ return String(a).localeCompare(String(b)); });
+    var grandReceivable = 0;
+    bodyHtml = order.map(function(name, i){
+      grandReceivable += byName[name];
+      return '<tr><td class="c">' + (i+1) + '</td><td class="l b">' + (name||'\u2014') + '</td><td class="r b">' + F(byName[name]) + '</td></tr>';
+    }).join('');
+    if (!order.length) bodyHtml = '<tr><td colspan="3" class="c" style="color:#86868b;padding:16px">No parties yet</td></tr>';
+    headHtml = '<tr><th style="width:10%">#</th><th style="width:55%">Party Name</th><th class="r" style="width:35%">Receivable</th></tr>';
+    footHtml = '<tr class="total"><td colspan="2" class="r">Grand Total</td><td class="r">' + F(grandReceivable) + '</td></tr>';
+  } else {
+    // Option 1 — full detail, one row per party ledger record
+    titleText = 'Cash LC \u2014 Party Summary';
+    var rows = ST.parties.slice().sort(function(a,b){ return String(a.name).localeCompare(String(b.name)); });
+    var grandDebit = 0, grandCredit = 0, grandBalance = 0;
+    bodyHtml = rows.map(function(p, i) {
+      var c = calc(p);
+      grandDebit += c.tdFull;
+      grandCredit += c.tc;
+      grandBalance += c.bal;
+      var typeLabel = p.ptype === 'fabric' ? 'Fabric' : 'Accessories';
+      return '<tr><td class="c">' + (i+1) + '</td>'
+        + '<td class="l b">' + (p.name||'\u2014') + '</td>'
+        + '<td class="c">' + typeLabel + '</td>'
+        + '<td class="r">' + F(c.tdFull) + '</td>'
+        + '<td class="r">' + F(c.tc) + '</td>'
+        + '<td class="r b">' + F(c.bal) + '</td></tr>';
+    }).join('');
+    if (!rows.length) bodyHtml = '<tr><td colspan="6" class="c" style="color:#86868b;padding:16px">No parties yet</td></tr>';
+    headHtml = '<tr><th style="width:6%">#</th><th style="width:30%">Party Name</th><th style="width:14%">Type</th>'
+      + '<th class="r" style="width:16%">Total Debit</th><th class="r" style="width:16%">Total Credit</th><th class="r" style="width:18%">Balance</th></tr>';
+    footHtml = '<tr class="total"><td colspan="3" class="r">Grand Total</td>'
+      + '<td class="r">' + F(grandDebit) + '</td><td class="r">' + F(grandCredit) + '</td><td class="r">' + F(grandBalance) + '</td></tr>';
+  }
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Cash LC Summary</title>';
   html += '<style>';
@@ -6775,13 +6803,11 @@ function printDashboardSummary() {
   html += '@media print{body{padding:0}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid}tr.total{page-break-before:avoid;break-before:avoid}}';
   html += '</style></head><body>';
   html += '<div class="hdr"><div class="company">XYX FASHION</div>';
-  html += '<div class="title">Cash LC \u2014 Party Summary</div>';
+  html += '<div class="title">' + titleText + '</div>';
   html += '<div class="meta">As of ' + FDP(today) + '</div></div>';
-  html += '<table><thead><tr><th style="width:6%">#</th><th style="width:30%">Party Name</th><th style="width:14%">Type</th>'
-    + '<th class="r" style="width:16%">Total Debit</th><th class="r" style="width:16%">Total Credit</th><th class="r" style="width:18%">Balance</th></tr></thead>';
+  html += '<table><thead>' + headHtml + '</thead>';
   html += '<tbody>' + bodyHtml + '</tbody>';
-  html += '<tfoot><tr class="total"><td colspan="3" class="r">Grand Total</td>'
-    + '<td class="r">' + F(grandDebit) + '</td><td class="r">' + F(grandCredit) + '</td><td class="r">' + F(grandBalance) + '</td></tr></tfoot>';
+  html += '<tfoot>' + footHtml + '</tfoot>';
   html += '</table>';
   html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>XYX FASHION \u2014 Cash LC Summary</span></div>';
   html += '</body></html>';
@@ -7163,6 +7189,26 @@ if(checkSession()){
     <div class="mft">
       <button class="btn bg" onclick="cm('m-locker-edit-log')">Cancel</button>
       <button class="btn bp" onclick="saveLockerLogEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CASH LC DASHBOARD: PRINT FORMAT CHOICE -->
+<div class="modal-overlay" id="m-dashboard-print-choice">
+  <div class="modal" style="width:440px">
+    <div class="mh"><h2>Choose Print Format</h2><button class="mcl" onclick="cm('m-dashboard-print-choice')">&#x2715;</button></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div onclick="cm('m-dashboard-print-choice');printDashboardSummary('detailed')" style="cursor:pointer;padding:14px 16px;background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);transition:background .15s" onmouseover="this.style.background='var(--acl)'" onmouseout="this.style.background='var(--bg3)'">
+        <div style="font-weight:700;font-size:13.5px;margin-bottom:4px">Option 1 &mdash; Full Detail</div>
+        <div style="font-size:12px;color:var(--tx2)">Party Name, Type, Total Debit, Total Credit, Balance &mdash; one row per ledger</div>
+      </div>
+      <div onclick="cm('m-dashboard-print-choice');printDashboardSummary('simple')" style="cursor:pointer;padding:14px 16px;background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);transition:background .15s" onmouseover="this.style.background='var(--acl)'" onmouseout="this.style.background='var(--bg3)'">
+        <div style="font-weight:700;font-size:13.5px;margin-bottom:4px">Option 2 &mdash; Receivable Summary</div>
+        <div style="font-size:12px;color:var(--tx2)">Just Party Name and combined Receivable &mdash; Accessories + Fabric merged into one balance per party</div>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn bg" onclick="cm('m-dashboard-print-choice')">Cancel</button>
     </div>
   </div>
 </div>
