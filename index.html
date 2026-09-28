@@ -158,27 +158,50 @@ select option{background:var(--bg2)}
 .period-result strong{font-family:'DM Mono',monospace}
 
 /* TABLE */
-.tw{overflow-x:auto}
-.tw thead th{position:sticky;top:0;z-index:5;transition:box-shadow .2s ease}
-.tw.tw-scrolled thead th{box-shadow:0 4px 10px rgba(38,38,36,.12)}
-.tw thead th{font-size:13px!important;font-weight:900!important;color:var(--tx)!important}
+/* A table that's wider than the screen scrolls sideways inside its card.
+   Its column headers float at the top of the window while you scroll down,
+   and a scrollbar floats at the bottom of the window while the table's own
+   scrollbar is off-screen (see FLOATING TABLE HEADER + SCROLLBAR). */
+.tw{overflow-x:auto;overflow-y:hidden}
+.tw::-webkit-scrollbar{height:10px}
+.tw thead th,#float-head thead th{font-size:13px!important;font-weight:900!important;color:var(--tx)!important}
 @keyframes rowJumpFlash{0%{background:var(--acl)}70%{background:var(--acl)}100%{background:transparent}}
 .row-jump-highlight{animation:rowJumpFlash 2.4s ease forwards;box-shadow:inset 3px 0 0 0 var(--ac)!important}
 table{width:100%;border-collapse:collapse}
-thead th{padding:9px 8px;text-align:left;font-size:13px;font-weight:900;color:var(--tx);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--bdr2);white-space:normal;word-break:break-word;background:var(--bg3)}
+thead th{padding:9px 8px;text-align:left;font-size:13px;font-weight:900;color:var(--tx);text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--bdr2);white-space:normal;background:var(--bg3)}
 th.r,td.r{text-align:right}
 tbody tr{border-bottom:1px solid var(--bdr);transition:background .1s}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--acl)}
-td{padding:8px 8px;font-size:11.5px;white-space:normal;word-break:break-word;overflow-wrap:break-word}
-/* Numbers, LC numbers, and dates stay on one line — only free text (notes,
-   remarks, supplier names) wraps, since breaking a figure across two lines
-   makes it hard to read. Everything else wraps so the whole table fits the
-   screen width without needing horizontal scrolling. */
+td{padding:8px 8px;font-size:11.5px;white-space:normal}
+/* Words are never split in the middle ("CO MP AN Y", "MT Swe aters").
+   Headers and text wrap only between words; if a table still doesn't fit,
+   it scrolls sideways instead. */
+.tw th,.tw td,.tw td *,#float-head th{word-break:normal!important;overflow-wrap:normal!important}
+/* Text columns (supplier, buyer, party, remarks…) keep a sensible width so a
+   name wraps onto about two lines instead of one word per line. */
+.tw td:not(.mn):not(.dm):not(.r):not(.no-print){min-width:100px}
+/* Numbers, LC numbers and dates always stay on one line. */
 td.mn{font-family:'DM Mono',monospace;font-size:11px;white-space:nowrap}
 td.dm{color:var(--tx3);font-size:11px;white-space:nowrap}
 tfoot tr{border-top:1px solid var(--bdr2);background:var(--bg3)}
 tfoot td{padding:8px 12px;font-weight:600;font-family:'DM Mono',monospace;font-size:12px}
+tfoot td.r{white-space:nowrap} /* totals like ৳73,500 no longer split across two lines */
+
+/* FLOATING TABLE HEADER + SCROLLBAR */
+#float-head{position:fixed;top:0;z-index:150;overflow:hidden;display:none;background:var(--bg3);box-shadow:0 4px 12px rgba(38,38,36,.14);border-bottom:1px solid var(--bdr2);pointer-events:auto}
+#float-head table{table-layout:fixed;border-collapse:collapse}
+#float-head thead th{border-bottom:2px solid var(--bdr2)}
+#float-scroll{position:fixed;bottom:0;z-index:150;overflow-x:auto;overflow-y:hidden;display:none;height:16px;background:var(--bg2);border-top:1px solid var(--bdr2);box-shadow:0 -3px 10px rgba(38,38,36,.10)}
+#float-scroll>div{height:1px}
+#float-scroll::-webkit-scrollbar{height:14px}
+#float-scroll::-webkit-scrollbar-thumb{background:var(--tx3);border-radius:7px;border:3px solid var(--bg2)}
+#float-scroll::-webkit-scrollbar-thumb:hover{background:var(--tx2)}
+/* Firefox only. In Chrome/Safari, setting scrollbar-color switches OFF the
+   ::-webkit-scrollbar styling above — and on a Mac that turns this into an
+   auto-hiding scrollbar, i.e. an empty strip until you start scrolling. */
+@supports (-moz-appearance:none){#float-scroll{scrollbar-width:auto;scrollbar-color:var(--tx3) var(--bg2)}}
+@media print{#float-head,#float-scroll{display:none!important}}
 
 /* PILLS / CHIPS */
 .pill{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:650;cursor:pointer;border:none}
@@ -308,7 +331,7 @@ tfoot td{padding:8px 12px;font-weight:600;font-family:'DM Mono',monospace;font-s
 .print-section-title{display:none}
 #sb-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:450}
 @media(max-width:768px){
-  #sidebar{transform:translateX(-220px);z-index:500}
+  #sidebar{transform:translateX(-100%);z-index:500}
   #main{margin-left:0;max-width:100vw;padding:16px}
   body.sb-mobile-open #sidebar{transform:translateX(0)}
   body.sb-mobile-open #sb-backdrop{display:block}
@@ -325,6 +348,12 @@ tfoot td{padding:8px 12px;font-weight:600;font-family:'DM Mono',monospace;font-s
 </style>
 </head>
 <body>
+<script>
+// Apply the saved theme before anything is drawn — otherwise every page load
+// briefly flashes the dark theme and then fades to light.
+try { if (localStorage.getItem('lc_theme') !== 'dark') document.body.classList.add('light'); }
+catch (e) { document.body.classList.add('light'); }
+</script>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -462,6 +491,7 @@ tfoot td{padding:8px 12px;font-weight:600;font-family:'DM Mono',monospace;font-s
           </div>
           <button class="btn bg bsm" onclick="checkForGhostLCs()" title="Scan for LCs that show as accepted but have no real acceptance record">&#128269; Check Ghosts</button>
           <button class="btn bg bsm" onclick="refreshBankData()" title="Reload banking data from Sheets">&#8635; Refresh</button>
+          <button class="btn bpr bsm" onclick="openBankPrintChoice()" title="Print Opened LCs and Accepted Bills"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:2px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Print</button>
           <button class="btn bp bsm" onclick="openAddBankLC()">+ Add LC</button>
         </div>
       </div>
@@ -878,10 +908,10 @@ tfoot td{padding:8px 12px;font-weight:600;font-family:'DM Mono',monospace;font-s
             <div class="period-result" id="c-pr"></div>
           </div>
           <div class="tw"><table>
-            <thead><tr id="dth"><th>#</th><th>Date</th><th>Type</th><th class="r">Amount (BDT)</th><th>Remarks</th><th class="no-print">Actions</th></tr></thead>
+            <thead><tr><th>#</th><th>Date</th><th>Type</th><th class="r">Amount (BDT)</th><th>Remarks</th><th class="no-print">Actions</th></tr></thead>
             <tbody id="ctb"></tbody>
             <tfoot><tr>
-              <td colspan="3" style="color:var(--tx3);font-size:10px;font-weight:400;font-family:'DM Sans'">Total (filtered)</td>
+              <td colspan="3" style="color:var(--tx3);font-size:10px;font-weight:400">Total (filtered)</td>
               <td class="r" id="cft" style="color:var(--gr)"></td><td colspan="2"></td>
             </tr></tfoot>
           </table></div>
@@ -903,7 +933,7 @@ tfoot td{padding:8px 12px;font-weight:600;font-family:'DM Mono',monospace;font-s
               <th class="r">Debit (BDT)</th><th class="r">Credit (BDT)</th><th class="r">Balance</th></tr></thead>
             <tbody id="rtb"></tbody>
             <tfoot><tr>
-              <td colspan="2" style="color:var(--tx3);font-size:10px;font-weight:400;font-family:'DM Sans'">Totals</td>
+              <td colspan="2" style="color:var(--tx3);font-size:10px;font-weight:400">Totals</td>
               <td class="r" id="rb-td" style="color:var(--rd)"></td>
               <td class="r" id="rb-tc" style="color:var(--gr)"></td>
               <td class="r" id="rb-bal"></td>
@@ -1081,7 +1111,7 @@ tfoot td{padding:8px 12px;font-weight:600;font-family:'DM Mono',monospace;font-s
 <!-- DELIVERY MODAL -->
 <div class="modal-overlay" id="m-dlv">
   <div class="modal" style="width:480px">
-    <div class="mh"><h2>Record Delivery</h2><button class="mcl" onclick="cm('m-dlv')">\u2715</button></div>
+    <div class="mh"><h2>Record Delivery</h2><button class="mcl" onclick="cm('m-dlv')">&#x2715;</button></div>
     <p style="color:var(--tx2);font-size:13px;margin-bottom:12px">LC: <span id="dlv-lc" style="color:var(--tx);font-family:'DM Mono',monospace"></span></p>
     <p style="color:var(--tx2);font-size:13px;margin-bottom:16px">Delivered so far: <span id="dlv-so-far" style="color:var(--tx);font-weight:500"></span></p>
     <div class="mfg"><label>Quantity to deliver now</label><input type="number" id="dlv-qty" placeholder="e.g. 40" min="1"></div>
@@ -1208,7 +1238,8 @@ const MODULE_ACTIVITY_MAP = {
   saveCreditor:'creditors', deleteCreditor:'creditors',
   saveCreditorRates:'creditors', fetchCreditorRatesNow:'creditors',
   saveLockerLog:'creditors', editLockerLog:'creditors', deleteLockerLog:'creditors',
-  saveLiability:'liability', deleteLiability:'liability',
+  saveCreditorsBatch:'creditors', saveLockerLogBatch:'creditors', saveCreditorMeta:'creditors',
+  saveLiability:'liability', deleteLiability:'liability', saveLiabilitiesBatch:'liability',
 };
 var MODULE_ACTIVITY = {};
 function renderModuleDateBanner(moduleName) {
@@ -1218,23 +1249,69 @@ function renderModuleDateBanner(moduleName) {
   el.textContent = stamp ? ('Last updated: ' + formatRatesTimestamp(stamp)) : 'Last updated: Never';
 }
 
+// Actions that change data. Used to notice when a save happens while the
+// startup refresh is still loading, so that older snapshot can't overwrite
+// the change on screen (see initApp).
+const MUTATING_ACTIONS = Object.assign({
+  saveParty:1, saveDebit:1, saveCredit:1, updateDebit:1, editDebit:1, deleteDebit:1,
+  editCredit:1, deleteCredit:1, saveTypes:1,
+}, MODULE_ACTIVITY_MAP);
+var _mutationSeq = 0, _inflightMutations = 0;
+
 async function api(action, body={}) {
   body.action=action;
-  const res = await fetch(SHEET_URL,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'text/plain'}});
-  const data = await res.json();
-  if(data.error) throw new Error(data.error);
-  // Auto-touch the owning module's "last updated" stamp for any mutating
-  // action in the map above — instant local update for the visible banner,
-  // plus a fire-and-forget call to persist it server-side, without making
-  // the original caller wait on this secondary write.
-  var touchedModule = MODULE_ACTIVITY_MAP[action];
-  if (touchedModule && action !== 'touchModuleActivity') {
-    var stamp = new Date().toISOString();
-    MODULE_ACTIVITY[touchedModule] = stamp;
-    renderModuleDateBanner(touchedModule);
-    api('touchModuleActivity', { module: touchedModule }).catch(function(){});
+  var isMutation = !!MUTATING_ACTIONS[action];
+  if (isMutation) { _mutationSeq++; _inflightMutations++; }
+  try {
+    const res = await fetch(SHEET_URL,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'text/plain'}});
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch (e) {
+      // Apps Script answers with an HTML page (not JSON) when the deployment
+      // needs re-authorizing or a quota is hit — say so instead of a cryptic parse error.
+      throw new Error('Server sent an unexpected response (HTTP ' + res.status + '). The Apps Script deployment may need re-authorizing.');
+    }
+    if(data.error) throw new Error(data.error);
+    // The server now stamps the module's "last updated" time itself, inside
+    // the same request — just reflect it on screen, no second request needed.
+    var touchedModule = MODULE_ACTIVITY_MAP[action];
+    if (touchedModule) {
+      MODULE_ACTIVITY[touchedModule] = data.moduleStamp || new Date().toISOString();
+      renderModuleDateBanner(touchedModule);
+    }
+    return data;
+  } finally {
+    if (isMutation) _inflightMutations--;
   }
-  return data;
+}
+
+// ── Small shared helpers ──
+// ── Names printed at the top of reports ──
+// Cash LC printouts (party ledger + Cash LC dashboard) deliberately carry a
+// placeholder name, NOT a real company.
+const PRINT_COMPANY_NAME = 'XYX FASHION';
+// Everything outside Cash LC prints the real name: a single company's
+// table gets that company; anything covering both companies (or personal
+// items) gets the group name.
+const COMPANY_PRINT_NAMES = { 'MT Sweaters': 'M.T. SWEATERS LIMITED', 'Banga Fashion': 'BANGA FASHION LIMITED' };
+const GROUP_PRINT_NAME = 'SHAHANA GROUP';
+// Today's date as YYYY-MM-DD in LOCAL time. toISOString() is UTC, which in
+// Bangladesh (UTC+6) gives YESTERDAY's date between midnight and 6 AM.
+function isoLocal(d) {
+  d = d || new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function todayISO() { return isoLocal(new Date()); }
+// Escape text for HTML
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+// Escape text for use inside a single-quoted JS string in an onclick="..."
+// attribute — names with an apostrophe (e.g. "Rahim's Trims") used to break
+// the click handler, or were silently saved with the apostrophe stripped.
+function jsq(s) {
+  return String(s == null ? '' : s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 // ═══ SECTION: STATE & FORMATTERS ═══
@@ -1264,7 +1341,8 @@ function saveToCache(data) {
     localStorage.setItem(CACHE_KEY, JSON.stringify({
       ts: Date.now(),
       parties: data.parties, debits: data.debits, credits: data.credits,
-      lcs: data.lcs, acceptances: data.acceptances, settings: data.settings
+      lcs: data.lcs, acceptances: data.acceptances, settings: data.settings,
+      paidBills: data.paidBills || [], moduleActivity: data.moduleActivity || {}
     }));
   } catch(e) {}
 }
@@ -1317,12 +1395,20 @@ async function initApp() {
 
   // ── Step 2: Fetch fresh data from Sheets (single call now) ──
   try {
+    var seqAtStart = _mutationSeq;
     BANK._loading = api('loadAll'); // ONE call returns everything
     const data = await BANK._loading;
     BANK._loading = null;
-    applyData(data);
-    saveToCache(data);
-    renderActivePage();
+    if (_mutationSeq !== seqAtStart) {
+      // You changed something (from the cached screen) while this was still
+      // loading — this snapshot may be older than that change. Keep what's
+      // on screen and quietly reload once your save has finished.
+      reloadCoreDataWhenIdle();
+    } else {
+      applyData(data);
+      saveToCache(data);
+      renderActivePage();
+    }
     showSync('ok', cached ? 'Updated' : 'Ready');
   } catch(e) {
     BANK._loading = null;
@@ -1351,6 +1437,22 @@ async function initApp() {
 
   // Same silent background preload for Liability
   LIABILITY._loading = loadLiabilityData().catch(function(){}).finally(function(){ LIABILITY._loading = null; });
+}
+
+// Waits until no save is in flight, then reloads Cash LC + Banking data.
+// Retries (up to 5 times) if another save starts while it's loading.
+async function reloadCoreDataWhenIdle(attempt) {
+  attempt = attempt || 0;
+  if (attempt > 5) return;
+  while (_inflightMutations > 0) { await new Promise(function(r){ setTimeout(r, 300); }); }
+  var seq = _mutationSeq;
+  try {
+    var data = await api('loadAll');
+    if (_mutationSeq !== seq) return reloadCoreDataWhenIdle(attempt + 1);
+    applyData(data);
+    saveToCache(data);
+    renderActivePage();
+  } catch (e) { /* keep what's on screen */ }
 }
 
 // ═══ SECTION: CALC (balance, FIFO coverage, totals) ═══
@@ -1429,17 +1531,34 @@ function openLedgerSelect(name) {
 // ═══ SECTION: NAVIGATION ═══
 var cashLCUnlocked = false; // PIN session flag for Cash LC section
 
+// Waits for a module's data if it isn't loaded yet. Never leaves the
+// "Loading..." message stuck, and a failed load can be retried by simply
+// opening the page again (the old code kept re-awaiting the failed request).
+async function ensureModuleLoaded(mod, loader, label) {
+  if (mod._loaded) return;
+  showSync('saving', mod._loading ? 'Loading...' : 'Loading ' + label + '...');
+  try {
+    if (!mod._loading) mod._loading = loader();
+    await mod._loading;
+  } catch (e) { /* handled below */ }
+  finally { mod._loading = null; }
+  if (mod._loaded) showSync('ok', 'Loaded');
+  else showSync('err', 'Could not load ' + label + ' — check connection and open the page again');
+}
+
 async function navigate(pg,pid) {
   closeMobileSidebar(); // always close the mobile overlay menu when navigating anywhere
+  // Cash LC needs its PIN (2803) BEFORE anything on screen changes —
+  // previously the current page was hidden first, so cancelling the PIN
+  // left a completely blank screen.
+  if ((pg === 'dashboard' || pg === 'party') && !cashLCUnlocked) {
+    var pinOk = await checkPin('2803');
+    if (!pinOk) return;
+    cashLCUnlocked = true;
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   if (pg==='dashboard') {
-    // Cash LC section requires its own PIN (2803)
-    if (!cashLCUnlocked) {
-      var pinOk = await checkPin('2803');
-      if (!pinOk) return;
-      cashLCUnlocked = true;
-    }
     document.getElementById('page-dashboard').classList.add('active');
     var navCash = document.getElementById('nav-cashlc');
     if (navCash) navCash.classList.add('active');
@@ -1465,83 +1584,31 @@ async function navigate(pg,pid) {
     document.getElementById('page-loans').classList.add('active');
     var nlo = document.getElementById('nav-loans');
     if (nlo) nlo.classList.add('active');
-    if (!LOANS._loaded) {
-      if (LOANS._loading) {
-        showSync('saving','Loading...');
-        try { await LOANS._loading; } catch(e) {}
-      } else {
-        showSync('saving','Loading loans...');
-        LOANS._loading = loadLoansData();
-        await LOANS._loading;
-        LOANS._loading = null;
-      }
-      showSync('ok','Loaded');
-    }
+    await ensureModuleLoaded(LOANS, loadLoansData, 'loans');
     renderLoansPage();
   } else if (pg==='fdr') {
     document.getElementById('page-fdr').classList.add('active');
     var nfdr = document.getElementById('nav-fdr');
     if (nfdr) nfdr.classList.add('active');
-    if (!FDR._loaded) {
-      if (FDR._loading) {
-        showSync('saving','Loading...');
-        try { await FDR._loading; } catch(e) {}
-      } else {
-        showSync('saving','Loading FDR data...');
-        FDR._loading = loadFDRData();
-        await FDR._loading;
-        FDR._loading = null;
-      }
-      showSync('ok','Loaded');
-    }
+    await ensureModuleLoaded(FDR, loadFDRData, 'FDR data');
     showFDRDashboard();
   } else if (pg==='creditors') {
     document.getElementById('page-creditors').classList.add('active');
     var ncred = document.getElementById('nav-creditors');
     if (ncred) ncred.classList.add('active');
-    if (!CREDITORS._loaded) {
-      if (CREDITORS._loading) {
-        showSync('saving','Loading...');
-        try { await CREDITORS._loading; } catch(e) {}
-      } else {
-        showSync('saving','Loading creditors...');
-        CREDITORS._loading = loadCreditorsData();
-        await CREDITORS._loading;
-        CREDITORS._loading = null;
-      }
-      showSync('ok','Loaded');
-    }
+    await ensureModuleLoaded(CREDITORS, loadCreditorsData, 'creditors');
     renderCreditorsPage();
   } else if (pg==='liability') {
     document.getElementById('page-liability').classList.add('active');
     var nliab = document.getElementById('nav-liability');
     if (nliab) nliab.classList.add('active');
     // Liability reads creditorRate('USD') from CREDITORS.rates — make sure
-    // that's actually loaded first, not just Liability's own data, since
-    // both preload in parallel and Creditors might not be done yet.
-    if (!CREDITORS._loaded && CREDITORS._loading) {
-      try { await CREDITORS._loading; } catch(e) {}
-    }
-    if (!LIABILITY._loaded) {
-      if (LIABILITY._loading) {
-        showSync('saving','Loading...');
-        try { await LIABILITY._loading; } catch(e) {}
-      } else {
-        showSync('saving','Loading liabilities...');
-        LIABILITY._loading = loadLiabilityData();
-        await LIABILITY._loading;
-        LIABILITY._loading = null;
-      }
-      showSync('ok','Loaded');
-    }
+    // that's actually loaded first, not just Liability's own data.
+    await ensureModuleLoaded(CREDITORS, loadCreditorsData, 'exchange rates');
+    await ensureModuleLoaded(LIABILITY, loadLiabilityData, 'liabilities');
     renderLiabilityPage();
   } else {
-    // Party page is inside Cash LC section — same dedicated PIN (2803)
-    if (!cashLCUnlocked) {
-      var pinOk2 = await checkPin('2803');
-      if (!pinOk2) return;
-      cashLCUnlocked = true;
-    }
+    // Party page is inside Cash LC section — PIN already checked at the top
     ST.cParty=pid;
     document.getElementById('page-party').classList.add('active');
     renderPartyPage();
@@ -1578,8 +1645,8 @@ function renderDashboard() {
       var tTag=p.ptype==='fabric'
         ?'<span style="font-size:10px;padding:2px 7px;background:var(--bg3);color:var(--bl);border:1px solid var(--bdr);border-radius:4px;vertical-align:middle;margin-left:5px">Fabric</span>'
         :'<span style="font-size:10px;padding:2px 7px;background:var(--bg3);color:var(--gr);border:1px solid var(--bdr);border-radius:4px;vertical-align:middle;margin-left:5px">Accessories</span>';
-      html+='<div class="pc" onclick="openLedgerSelect(\''+p.name+'\')">'
-        +'<div class="pcn">'+p.name+' '+tTag+'</div>'
+      html+='<div class="pc" onclick="openLedgerSelect(\''+jsq(p.name)+'\')">'
+        +'<div class="pcn">'+esc(p.name)+' '+tTag+'</div>'
         +'<div class="pc-recv"><span class="pl">Receivable</span><span class="pv '+(c.bal>0?'r':'g')+'">'+F(c.bal)+'</span></div>'
         +'<div class="pr"><span class="pl">Total Debit</span><span class="pv" style="color:var(--tx2)">'+F(c.tdFull)+'</span></div>'
         +'<div class="pr"><span class="pl">Total Credit</span><span class="pv" style="color:var(--tx2)">'+F(c.tc)+'</span></div>'
@@ -1588,12 +1655,12 @@ function renderDashboard() {
     } else {
       // Multi-ledger — whole card clicks to open ledger selection modal
       var cBal=pts.reduce(function(s,p){return s+calc(p).bal},0);
-      html+='<div class="pc" onclick="openLedgerSelect(\''+name+'\')" style="cursor:pointer">';
+      html+='<div class="pc" onclick="openLedgerSelect(\''+jsq(name)+'\')" style="cursor:pointer">';
       html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">';
-      html+='<div class="pcn" style="margin-bottom:0">'+name
+      html+='<div class="pcn" style="margin-bottom:0">'+esc(name)
         +' <span style="font-size:10px;padding:2px 7px;background:var(--bg3);color:var(--gr);border:1px solid var(--bdr);border-radius:4px;vertical-align:middle">ACC</span>'
         +' <span style="font-size:10px;padding:2px 7px;background:var(--bg3);color:var(--bl);border:1px solid var(--bdr);border-radius:4px;vertical-align:middle">FAB</span></div>';
-      html+='<div style="text-align:right"><div style="font-size:20px;font-weight:500;color:var(--rd)">'+F(cBal)+'</div><div style="font-size:10px;color:var(--tx3)">Combined receivable</div></div>';
+      html+='<div style="text-align:right"><div style="font-size:20px;font-weight:500;color:'+(cBal>0?'var(--rd)':'var(--gr)')+'">'+F(cBal)+'</div><div style="font-size:10px;color:var(--tx3)">Combined receivable</div></div>';
       html+='</div>';
       html+='<div style="display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--bdr)">';
       pts.forEach(function(p){
@@ -1882,6 +1949,19 @@ async function tf(id,field,cur,nxt){
   const _pty=ST.parties.find(x=>String(x.id)===String(d.partyId));
   const _isFabric=_pty&&_pty.ptype==='fabric';
 
+  // Guard: accessories need doc before acceptance (checked BEFORE asking
+  // for a maturity date, so you aren't asked for a date that gets thrown away)
+  if (!_isFabric && field==='accept' && nxt==='yes' && d.doc!=='yes') {
+    showAlert('Document must be given before acceptance can be marked.');
+    return;
+  }
+
+  // Taking acceptance away (directly, or by removing the document) deletes
+  // Banking's acceptance record and its maturity date — so it needs the
+  // 388 PIN, the same as Undo on the Banking side. Giving acceptance doesn't.
+  var removingAccept = d.accept==='yes' && ((field==='accept' && d[field]===cur && nxt!=='yes') || (field==='doc' && cur==='yes'));
+  if (removingAccept && !await checkPin()) return;
+
   // Ask for maturity date when GIVING acceptance (custom modal, not browser prompt)
   var _maturityDate = '';
   if (field==='accept' && nxt==='yes') {
@@ -1889,11 +1969,6 @@ async function tf(id,field,cur,nxt){
     if (_maturityDate===null) return; // user cancelled
   }
 
-  // Guard: accessories need doc before acceptance
-  if (!_isFabric && field==='accept' && nxt==='yes' && d.doc!=='yes') {
-    showAlert('Document must be given before acceptance can be marked.');
-    return;
-  }
   // Guard: removing doc also clears acceptance
   if (field==='doc' && cur==='yes' && d.accept==='yes') {
     if (!await showConfirm('This LC has acceptance given. Removing the document will also clear the acceptance. Continue?')) return;
@@ -2038,7 +2113,7 @@ function filterEditPartyList(){
   dd.style.width = Math.max(rect.width,200)+'px';
   dd.innerHTML = filtered.map(function(n){
     var types = nameMap[n].join(', ');
-    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)" onmousedown="pickEditPartyName(\''+n.replace(/'/g,'')+'\')">'+n+' <span style="font-size:10px;color:var(--tx3);margin-left:6px">has: '+types+'</span></div>';
+    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)" onmousedown="pickEditPartyName(\''+jsq(n)+'\')">'+esc(n)+' <span style="font-size:10px;color:var(--tx3);margin-left:6px">has: '+types+'</span></div>';
   }).join('');
   dd.style.display = '';
 }
@@ -2101,9 +2176,15 @@ async function svLCEdit(){
   const movedParty = targetParty.id !== oldPartyId;
   const isFabricTarget = targetParty.ptype === 'fabric';
 
+  // Validate BEFORE touching the record — previously a blank LC number was
+  // written into the entry first and only then rejected, leaving a
+  // half-edited, unsaved entry on screen.
+  const newLcNo = (document.getElementById('ln').value||'').trim();
+  if (!newLcNo) { showAlert('LC number is required.'); return; }
+
   d.partyId = targetParty.id;
   d.date    = (document.getElementById('ld').value||'').trim();
-  d.lc      = (document.getElementById('ln').value||'').trim();
+  d.lc      = newLcNo;
   d.company = (document.getElementById('lco').value||'').trim();
   d.usd     = NUM(document.getElementById('lu').value);
   d.rate    = NUM(document.getElementById('lr').value) || 129;
@@ -2111,8 +2192,6 @@ async function svLCEdit(){
   d.notes   = (document.getElementById('lnotes').value||'').trim();
   d.commission = isFabricTarget ? NUM(document.getElementById('lcomm').value) : 0;
   d.packages   = isFabricTarget ? NUM(document.getElementById('lpkg').value)  : 0;
-
-  if (!d.lc) { showAlert('LC number is required.'); return; }
 
   if (d.company) saveNewCompany(d.company);
   cm('m-lc');
@@ -2139,7 +2218,17 @@ async function svLCEdit(){
       _bLc.supplier = d.company; // keep Banking's supplier in sync with Cash LC's
       _bLc.cashPartyId   = d.partyId;
       _bLc.cashPartyType = isFabricTarget ? 'fabric' : 'accessories';
+      // Cash LC is one document: if it's already accepted, the accepted
+      // amount (and the pending acceptance behind it) must follow the edit,
+      // otherwise Banking's Total Liability keeps the OLD amount.
+      var _pendAcc = BANK.acceptances.filter(function(a){ return String(a.bankLcId)===String(_bLc.id) && a.status==='pending'; });
+      if (NUM(_bLc.acceptedUSD) > 0) _bLc.acceptedUSD = d.usd;
       await api('editBankLC', _bLc);
+      if (_pendAcc.length === 1) {
+        var _acc = _pendAcc[0];
+        _acc.usd = d.usd; _acc.bdt = d.usd * (BANK.settings.rate || 122.5); _acc.lcNo = d.lc;
+        await api('saveAcceptance', _acc);
+      }
       if (document.getElementById('page-banking').classList.contains('active')) renderBankingPage();
     }
   } catch(e) {
@@ -2193,9 +2282,11 @@ async function svNewType() {
   refreshTypeDropdowns(n);
   cm('m-addtype');
   showSync('saving','Saving payment type...');
-  // Save to ALL parties so the type is available everywhere
+  // Saved to ALL parties so the type is available everywhere — the server
+  // writes every party in one go, so this is ONE request (it used to send
+  // one request per party, each rewriting every party).
   try {
-    await Promise.all(ST.parties.map(p => api('saveTypes',{partyId:p.id,types:ST.ctypes})));
+    if (ST.parties.length) await api('saveTypes',{types:ST.ctypes});
     showSync('ok','Payment type saved ✓');
   } catch(e) { showSync('err','Save failed'); }
 }
@@ -2229,10 +2320,10 @@ function filterTypeList() {
   dd.style.left  = rect.left + 'px';
   dd.style.width = rect.width + 'px';
   dd.innerHTML = filtered.map(t =>
-    `<div class="type-opt" data-val="${t}"
+    `<div class="type-opt" data-val="${esc(t)}"
       style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)"
-      onmousedown="pickType('${t.replace(/'/g,'\x27')}')">
-      ${t}
+      onmousedown="pickType('${jsq(t)}')">
+      ${esc(t)}
     </div>`
   ).join('');
   dd.style.display = '';
@@ -2299,11 +2390,8 @@ function handleTypeKey(e) {
 
 async function saveNewType(val) {
   if (!ST.ctypes) ST.ctypes = [];
-  const p = ST.parties.find(x => x.id === ST.cParty);
   try {
-    if (ST.parties.length) {
-      await Promise.all(ST.parties.map(pa => api('saveTypes',{partyId:pa.id,types:ST.ctypes})));
-    }
+    if (ST.parties.length) await api('saveTypes',{types:ST.ctypes});
   } catch(e) {}
 }
 
@@ -2389,7 +2477,7 @@ function handleCoKey(e) {
     e.preventDefault();
     const active = dd.querySelector('.co-opt.active');
     const next = active ? active.nextElementSibling : items[0];
-    if (active) active.classList.remove('active');
+    if (active) { active.classList.remove('active'); active.style.background=''; }
     if (next) { next.classList.add('active'); next.style.background='var(--bg3)'; }
   } else if (e.key === 'ArrowUp') {
     e.preventDefault();
@@ -2424,7 +2512,7 @@ function filterBLCSupplierList() {
   dd.style.left = rect.left + 'px';
   dd.style.width = rect.width + 'px';
   dd.innerHTML = filtered.map(function(c){
-    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)" onmousedown="pickBLCSupplier(\''+c.replace(/'/g,'')+'\')">'+c+'</div>';
+    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)" onmousedown="pickBLCSupplier(\''+jsq(c)+'\')">'+esc(c)+'</div>';
   }).join('');
   dd.style.display = '';
 }
@@ -2474,7 +2562,7 @@ function filterPartyNames(){
   dd.style.width = Math.max(rect.width,200)+'px';
   dd.innerHTML = filtered.map(function(n){
     var types = nameMap[n].join(', ');
-    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)" onmousedown="pickPartyName(\''+n.replace(/'/g,'')+'\')">'+n+' <span style="font-size:10px;color:var(--tx3);margin-left:6px">has: '+types+'</span></div>';
+    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)" onmousedown="pickPartyName(\''+jsq(n)+'\')">'+esc(n)+' <span style="font-size:10px;color:var(--tx3);margin-left:6px">has: '+types+'</span></div>';
   }).join('');
   dd.style.display = filtered.length ? '' : 'none';
 }
@@ -2496,7 +2584,7 @@ function openAddParty(){
   ST.editPIdx=null;
   document.getElementById('pm-title').textContent='Add New Party';
   document.getElementById('pm-n').value=''; document.getElementById('pm-p').value='';
-  document.getElementById('pm-s').value=new Date().toISOString().split('T')[0];
+  document.getElementById('pm-s').value=todayISO();
   document.getElementById('pm-type').value='accessories';
   om('m-party');
 }
@@ -2539,7 +2627,7 @@ function openAddLC(){
   btn.textContent = 'Add to Ledger';
   btn.disabled = false;
   btn.onclick = svLC;
-  document.getElementById('ld').value = new Date().toISOString().split('T')[0];
+  document.getElementById('ld').value = todayISO();
   ['ln','lco','lu','lb','lnotes'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('lr').value = getLastRateFor(ST.cParty) || '129';
   document.getElementById('lc-dup-msg').style.display = 'none';
@@ -2658,12 +2746,20 @@ let _pId=null;
 function oPM(id){_pId=id;const d=ST.debits.find(x=>x.id===id);document.getElementById('py-lc').textContent=d.lc;om('m-pay');}
 async function setPay(s){
   const d=ST.debits.find(x=>x.id===_pId); if(!d) return;
-  d.payment=s; cm('m-pay'); rDT(); renderPartyPage();
+  if (d.payment === s) { cm('m-pay'); return; } // nothing changes
+  var undoingPaid = d.payment === 'paid' && s !== 'paid';
+  cm('m-pay');
+  // Turning a paid LC back to Due is an Undo Payment — same 388 PIN as Banking
+  if (undoingPaid && !await checkPin()) return;
+  d.payment=s; rDT(); renderPartyPage();
   showSync('saving','Saving...');
   try{
-    await api('updateDebit',{id:_pId,field:'payment',value:s});
+    await api('updateDebit',{id:d.id,field:'payment',value:s});
     showSync('ok','Saved');
+    // Cash LC is always one document, so both directions must reach Banking —
+    // previously marking Due here left Banking showing the LC as paid.
     if(s==='paid') await syncPaymentToBanking(d.lc, d.partyId);
+    else if (undoingPaid) await syncUnpayToBanking(d.lc, d.partyId);
   }catch(e){showSync('err','Save failed');}
 }
 
@@ -2699,7 +2795,7 @@ async function svDlv(){
     if (!await showConfirm('This delivery (' + (soFar+qty) + ') exceeds total packages (' + pkg + '). Continue?')) return;
   }
   const dlvs = getDlvs(d);
-  dlvs.push({d: new Date().toISOString().split('T')[0], q: qty});
+  dlvs.push({d: todayISO(), q: qty});
   d.deliveries = JSON.stringify(dlvs);
   cm('m-dlv');
   rDT(); renderPartyPage();
@@ -2941,7 +3037,7 @@ function copyWA() {
 // ════════════════════════════════════
 
 
-// ═══ SECTION: PRINT (ledger report — XYX FASHION) ═══
+// ═══ SECTION: PRINT (ledger report) ═══
 function openPrintModal(){
   document.getElementById('print-from').value='';
   document.getElementById('print-to').value='';
@@ -2959,6 +3055,12 @@ function doPrint(){
   var to=document.getElementById('print-to').value;
   var hideUSD=document.getElementById('hide-usd').checked;
   var hideMaturity=document.getElementById('hide-maturity').checked;
+  // These two checkboxes existed but were never applied — the printout
+  // always showed every amount. Hiding either also hides the Balance
+  // column, since the balance would give the hidden figures away.
+  var hideBDT=document.getElementById('hide-bdt').checked;
+  var hideCreditAmt=document.getElementById('hide-credit-amt').checked;
+  var hideBal=hideBDT||hideCreditAmt;
   var combined=document.getElementById('print-combined').checked;
   var p=ST.parties.find(function(x){return x.id===ST.cParty});
   if(!p){showAlert('No party selected.');return;}
@@ -2970,6 +3072,9 @@ function doPrint(){
 
   function inRange(dt){var d=String(dt).split('T')[0];if(from&&d<from)return false;if(to&&d>to)return false;return true;}
   function TK(n){return '\u09F3'+Math.abs(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  // Balance with a "Cr" marker when the party is in credit (paid in advance).
+  // Previously a negative balance printed exactly like an amount owed.
+  function TKB(n){return TK(n)+(n< -0.005?' Cr':'');}
 
   var showDebit=what==='full'||what==='debit'||what==='running';
   var showCredit=what==='full'||what==='credit'||what==='running';
@@ -3013,12 +3118,15 @@ function doPrint(){
   var isFab=p.ptype==='fabric'; // kept for the title/meta line in single-ledger mode
   function FDP(d){if(!d)return'';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);}
   var running=opening,totalDebit=0,totalCredit=0;
+  function dCell(v){return hideBDT?'':'<td class="r">'+v+'</td>';}
+  function cCell(v){return hideCreditAmt?'':'<td class="r">'+v+'</td>';}
+  function bCell(v,cls){return hideBal?'':'<td class="r'+(cls||'')+'">'+v+'</td>';}
   var bodyRows=events.map(function(e){
     running+=e.debit-e.credit;totalDebit+=e.debit;totalCredit+=e.credit;
     var usdCell=(!hideUSD&&e.debit)?'<td class="usd">$'+NUM(e.usd).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' @ '+e.rate+'</td>':(!hideUSD?'<td></td>':'');
-    return '<tr><td class="c">'+FDP(e.date)+'</td>'+usdCell+'<td class="l">'+e.desc+(e.notes?'<div class="note">'+e.notes+'</div>':'')+'</td><td class="r">'+(e.debit?TK(e.debit):'')+'</td><td class="r">'+(e.credit?TK(e.credit):'')+'</td><td class="r b">'+TK(Math.abs(running))+'</td></tr>';
+    return '<tr><td class="c">'+FDP(e.date)+'</td>'+usdCell+'<td class="l">'+e.desc+(e.notes?'<div class="note">'+esc(e.notes)+'</div>':'')+'</td>'+dCell(e.debit?TK(e.debit):'')+cCell(e.credit?TK(e.credit):'')+bCell(TKB(running),' b')+'</tr>';
   }).join('');
-  var today=new Date().toISOString().split('T')[0];
+  var today=todayISO();
   var fromLabel=from?FDP(from):'Beginning';
   var toLabel=to?FDP(to):FDP(today);
   var colL=hideUSD?2:3;
@@ -3063,22 +3171,25 @@ function doPrint(){
   html+='.ft{page-break-inside:avoid;break-inside:avoid}';
   html+='}';
   html+='</style></head><body>';
-  html+='<div class="hdr"><div class="company">XYX FASHION</div>';
+  html+='<div class="hdr"><div class="company">'+esc(PRINT_COMPANY_NAME)+'</div>';
   html+='<div class="title">Ledger-wise Statement</div>';
-  var ledgerLabel = combined ? ' (Combined \u2014 Accessories + Fabric)' : (isFab?' (Fabric)':'');
-  html+='<div class="partyname">'+p.name+ledgerLabel+'</div>';
+  var ledgerLabel = combined ? ' (Combined — Accessories + Fabric)' : (isFab?' (Fabric)':'');
+  html+='<div class="partyname">'+esc(p.name)+ledgerLabel+'</div>';
   html+='<div class="meta">'+fromLabel+' to '+toLabel+'</div></div>';
-  html+='<table><thead><tr><th style="width:9%">Date</th>'+usdH+'<th>Particulars</th><th style="width:12%">Debit</th><th style="width:12%">Credit</th><th style="width:13%">Balance</th></tr></thead>';
-  html+='<tbody><tr class="opening"><td class="l" colspan="'+colL+'">Opening balance</td><td></td><td></td><td class="r b">'+TK(Math.abs(opening))+'</td></tr>';
+  html+='<table><thead><tr><th style="width:9%">Date</th>'+usdH+'<th>Particulars</th>'
+    +(hideBDT?'':'<th style="width:12%">Debit</th>')+(hideCreditAmt?'':'<th style="width:12%">Credit</th>')+(hideBal?'':'<th style="width:13%">Balance</th>')+'</tr></thead>';
+  html+='<tbody><tr class="opening"><td class="l" colspan="'+colL+'">Opening balance</td>'+dCell('')+cCell('')+bCell(TKB(opening),' b')+'</tr>';
   html+=bodyRows;
-  html+='<tr class="total"><td class="r" colspan="'+colL+'">Total</td><td class="r">'+TK(totalDebit)+'</td><td class="r">'+TK(totalCredit)+'</td><td class="r">'+TK(Math.abs(running))+'</td></tr>';
-  html+='<tr class="grand"><td class="r" colspan="'+colL+'">Grand total balance</td><td class="r">'+TK(grandDebit)+'</td><td class="r">'+TK(totalCredit)+'</td><td class="r">'+TK(Math.abs(running))+'</td></tr>';
+  html+='<tr class="total"><td class="r" colspan="'+colL+'">Total</td>'+dCell(TK(totalDebit))+cCell(TK(totalCredit))+bCell(TKB(running))+'</tr>';
+  html+='<tr class="grand"><td class="r" colspan="'+colL+'">Grand total balance</td>'+dCell(TK(grandDebit))+cCell(TK(totalCredit))+bCell(TKB(running))+'</tr>';
   html+='</tbody></table>';
-  html+='<div class="summary"><div class="sc"><div class="scl">Previous balance</div><div class="scv">'+TK(combinedPrevBalance)+'</div></div>';
-  html+='<div class="sc"><div class="scl">Total debit (incl prev)</div><div class="scv">'+TK(grandDebit)+'</div></div>';
-  html+='<div class="sc"><div class="scl">Total credit</div><div class="scv">'+TK(totalCredit)+'</div></div>';
-  html+='<div class="sc"><div class="scl">Net balance</div><div class="scv">'+TK(Math.abs(running))+'</div></div></div>';
-  html+='<div class="ft"><span>Generated: '+FDP(today)+'</span><span>XYX FASHION — LC Ledger</span></div>';
+  html+='<div class="summary">';
+  if(!hideBDT) html+='<div class="sc"><div class="scl">Previous balance</div><div class="scv">'+TKB(combinedPrevBalance)+'</div></div>'
+    +'<div class="sc"><div class="scl">Total debit (incl prev)</div><div class="scv">'+TK(grandDebit)+'</div></div>';
+  if(!hideCreditAmt) html+='<div class="sc"><div class="scl">Total credit</div><div class="scv">'+TK(totalCredit)+'</div></div>';
+  if(!hideBal) html+='<div class="sc"><div class="scl">Net balance</div><div class="scv">'+TKB(running)+'</div></div>';
+  html+='</div>';
+  html+='<div class="ft"><span>Generated: '+FDP(today)+'</span><span>'+esc(PRINT_COMPANY_NAME)+' — LC Ledger</span></div>';
   html+='</body></html>';
   cm('m-print');
   // Re-render the page after print to restore any display states
@@ -3101,7 +3212,7 @@ function askMaturityDate() {
   return new Promise(function(resolve) {
     _maturityResolve = resolve;
     // Default: 90 days from today
-    var def = new Date(Date.now() + 90*24*60*60*1000).toISOString().split('T')[0];
+    var def = isoLocal(new Date(Date.now() + 90*24*60*60*1000));
     document.getElementById('maturity-input').value = def;
     om('m-maturity');
     setTimeout(function(){ document.getElementById('maturity-input').focus(); }, 150);
@@ -3290,6 +3401,7 @@ async function loadBankData() {
     var data = await api('getBankData');
     BANK.lcs         = data.lcs         || [];
     BANK.acceptances = data.acceptances  || [];
+    if (data.paidBills) BANK.paidBills = data.paidBills;
     BANK._loaded     = true;
     if (data.settings) {
       BANK.settings.rate  = parseFloat(data.settings.rate)  || 122.5;
@@ -3303,21 +3415,19 @@ async function refreshBankData() {
   BANK._loaded = false;
   showSync('saving','Re-syncing with Sheets...');
   try {
-    // Full re-sync: runs auto-creation to catch any missing bank entries
+    // Full re-sync: runs auto-creation to catch any missing bank entries.
+    // The updated Code.gs returns Cash LC data (and paid bills) in the same
+    // response; an older one needs the second request.
     var data = await api('forceSync');
-    BANK.lcs         = data.lcs         || [];
-    BANK.acceptances = data.acceptances || [];
-    BANK._loaded     = true;
-    if (data.settings) {
-      BANK.settings.rate  = parseFloat(data.settings.rate)  || 122.5;
-      BANK.settings.limit = parseFloat(data.settings.limit) || 0;
+    if (!data.parties) {
+      var cashData = await api('load');
+      data.parties = cashData.parties; data.debits = cashData.debits; data.credits = cashData.credits;
     }
-    // Also refresh cash LC data
-    var cashData = await api('load');
-    ST.parties = cashData.parties||[]; ST.debits = cashData.debits||[]; ST.credits = cashData.credits||[];
-    saveToCache({ parties:ST.parties, debits:ST.debits, credits:ST.credits,
-                  lcs:BANK.lcs, acceptances:BANK.acceptances, settings:BANK.settings });
-  } catch(e) { showSync('err','Refresh failed'); return; }
+    if (!data.paidBills) data.paidBills = BANK.paidBills;
+    if (!data.moduleActivity) data.moduleActivity = MODULE_ACTIVITY;
+    applyData(data);
+    saveToCache(data);
+  } catch(e) { BANK._loaded = true; showSync('err','Refresh failed'); return; }
   renderActivePage();
   showSync('ok','All data refreshed');
 }
@@ -3387,12 +3497,11 @@ function dedupeByLcNo(items) {
   return result;
 }
 
-function renderOpenedLCs() {
-  var tbody = document.getElementById('bank-opened-tbody');
-  var rate  = BANK.settings.rate || 122.5;
-  var today = new Date().toISOString().split('T')[0];
-  // Only show LCs not yet fully accepted
-  // Also exclude by acceptedUSD in case status label is stale
+// The rows the Opened LCs table shows — shared with the Banking print, so
+// the printout always lists exactly what's on screen.
+function getOpenedLCRows() {
+  // Only LCs not yet fully accepted (also checked by acceptedUSD in case
+  // the status label is stale)
   var rows  = BANK.lcs.filter(function(l){
     if (l.status === 'paid') return false;
     var usd    = NUM(l.usd);
@@ -3402,9 +3511,17 @@ function renderOpenedLCs() {
   });
   rows = dedupeByLcNo(rows); // safety net — collapse any duplicate LC records before showing/counting them
   rows.sort(function(a,b){ return String(a.date).localeCompare(String(b.date)); });
+  return rows;
+}
+
+function renderOpenedLCs() {
+  var tbody = document.getElementById('bank-opened-tbody');
+  var rate  = BANK.settings.rate || 122.5;
+  var today = todayISO();
+  var rows  = getOpenedLCRows();
   var totUSD = 0, totBDT = 0;
   if (!rows.length) {
-    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:var(--tx3);padding:24px">No opened LCs. Click "+ Add LC" to start.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="14" style="text-align:center;color:var(--tx3);padding:24px">No opened LCs. Click "+ Add LC" to start.</td></tr>';
   } else {
     tbody.innerHTML = rows.map(function(l, i) {
       var usd    = NUM(l.usd);
@@ -3474,10 +3591,10 @@ function checkForGhostLCs() {
   );
 }
 
-function renderAcceptedBills() {
-  var tbody = document.getElementById('bank-acc-tbody');
+// The rows the Accepted Bills table shows (real acceptances plus any
+// "ghost" fallback rows), sorted by maturity — shared with the Banking print.
+function getAcceptedBillRows() {
   var rate  = BANK.settings.rate || 122.5;
-  var today = new Date().toISOString().split('T')[0];
   var rows  = BANK.acceptances.filter(function(a){ return a.status !== 'paid'; });
 
   // Fallback: check acceptedUSD > 0 regardless of status label
@@ -3505,6 +3622,14 @@ function renderAcceptedBills() {
   });
   rows = dedupeByLcNo(rows); // safety net — collapse any duplicate LC records before showing/counting them
   rows.sort(function(a,b){ return String(a.maturityDate).localeCompare(String(b.maturityDate)); });
+  return rows;
+}
+
+function renderAcceptedBills() {
+  var tbody = document.getElementById('bank-acc-tbody');
+  var rate  = BANK.settings.rate || 122.5;
+  var today = todayISO();
+  var rows  = getAcceptedBillRows();
   var totUSD = 0, totBDT = 0;
   if (!rows.length) {
     tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;color:var(--tx3);padding:24px">No accepted bills.</td></tr>';
@@ -3536,7 +3661,7 @@ function renderAcceptedBills() {
       }
 
       rowNum++;
-      var lc    = BANK.lcs.find(function(l){ return l.id === a.bankLcId; }) || {};
+      var lc    = BANK.lcs.find(function(l){ return String(l.id) === String(a.bankLcId); }) || {};
       var usd   = NUM(a.usd);
       var bdt   = usd * rate;  // always recalc from current rate
       totUSD += usd; totBDT += bdt;
@@ -3571,6 +3696,173 @@ function renderAcceptedBills() {
   document.getElementById('bank-acc-usd-total').textContent = FU(totUSD);
   document.getElementById('bank-acc-bdt-total').textContent = F(totBDT);
   document.getElementById('bank-acc-total').textContent = FU(totUSD) + ' / ' + F(totBDT);
+}
+
+// ═══ SECTION: BANKING PRINT ═══
+// Opened LCs + Accepted Bills for one company (its own name on top) or both
+// (Shahana Group). Same rows and BDT figures as the screen. A4 landscape,
+// since these tables are wide. The Cash LC party column is left out unless
+// you tick it, so Cash LC names don't appear on a company document.
+function bankLcCompanyOf(l) { return (l && l.company) || ''; }
+function openBankPrintChoice() {
+  var counts = { 'MT Sweaters': 0, 'Banga Fashion': 0, '': 0 };
+  var all = getOpenedLCRows().map(function(l){ return l; });
+  var accLcs = getAcceptedBillRows().map(function(a){ return BANK.lcs.find(function(l){ return String(l.id) === String(a.bankLcId); }) || {}; });
+  var seen = {};
+  all.concat(accLcs).forEach(function(l){
+    if (!l.id || seen[l.id]) return; seen[l.id] = 1;
+    var co = bankLcCompanyOf(l);
+    counts[co in counts ? co : ''] = (counts[co in counts ? co : ''] || 0) + 1;
+  });
+  var total = Object.keys(seen).length;
+  var sel = document.getElementById('bpr-company');
+  sel.innerHTML =
+      '<option value="MT Sweaters">M.T. Sweaters Limited (' + counts['MT Sweaters'] + ' LCs)</option>'
+    + '<option value="Banga Fashion">Banga Fashion Limited (' + counts['Banga Fashion'] + ' LCs)</option>'
+    + '<option value="all">Both companies — Shahana Group (' + total + ' LCs)</option>';
+  var note = document.getElementById('bpr-nocompany');
+  if (counts[''] > 0) {
+    note.textContent = counts[''] + ' LC' + (counts[''] === 1 ? ' has' : 's have') + ' no company set, so ' + (counts[''] === 1 ? 'it only appears' : 'they only appear') + ' under "Both companies". Set the company with Edit to include ' + (counts[''] === 1 ? 'it' : 'them') + ' in a single-company print.';
+    note.style.display = 'block';
+  } else note.style.display = 'none';
+  om('m-bank-print');
+}
+
+function printBanking() {
+  var co        = document.getElementById('bpr-company').value;
+  var showOpen  = document.getElementById('bpr-opened').checked;
+  var showAcc   = document.getElementById('bpr-accepted').checked;
+  var showParty = document.getElementById('bpr-party').checked;
+  if (!showOpen && !showAcc) { showAlert('Tick at least one table to print.'); return; }
+  var both      = co === 'all';
+  var printName = both ? GROUP_PRINT_NAME : (COMPANY_PRINT_NAMES[co] || GROUP_PRINT_NAME);
+  var rate      = BANK.settings.rate || 122.5;
+  var today     = todayISO();
+  function FDP(d){ if(!d) return '—'; var p = String(d).split('T')[0].split('-'); return p.length === 3 ? p[2]+'/'+p[1]+'/'+p[0].slice(2) : esc(d); }
+  function TKp(n){ return '৳' + NUM(n).toLocaleString('en-IN', { maximumFractionDigits: 0 }); }
+  function lcOf(id){ return BANK.lcs.find(function(l){ return String(l.id) === String(id); }) || {}; }
+  function inCo(l){ return both || bankLcCompanyOf(l) === co; }
+  function partyOf(l){ return (l.isCash === 'yes' && l.cashPartyId) ? esc(getCashPartyName(l.cashPartyId, l.cashPartyType)) : ''; }
+  var coTh = both ? '<th>Company</th>' : '';
+  var ptTh = showParty ? '<th>Party</th>' : '';
+  function coTd(l){ return both ? '<td class="l">' + esc(bankLcCompanyOf(l) || '—') + '</td>' : ''; }
+  function ptTd(l){ return showParty ? '<td class="l">' + partyOf(l) + '</td>' : ''; }
+
+  // ── Opened LCs ──
+  var openRows = getOpenedLCRows().filter(inCo);
+  var oUsd = 0, oAcc = 0, oRem = 0, oRemBdt = 0, oFullBdt = 0;
+  var openBody = openRows.map(function(l, i){
+    var usd = NUM(l.usd), acc = NUM(l.acceptedUSD), rem = Math.max(0, usd - acc);
+    oUsd += usd; oAcc += acc; oRem += rem; oRemBdt += rem * rate; oFullBdt += usd * rate;
+    var expired = l.expiryDate && String(l.expiryDate).split('T')[0] < today;
+    return '<tr><td class="c">' + (i+1) + '</td>' + coTd(l)
+      + '<td class="c">' + FDP(l.date) + '</td>'
+      + '<td class="l b nw">' + esc(l.lcNo || '—') + '</td>'
+      + '<td class="l">' + esc(l.supplier || '—') + '</td>'
+      + '<td class="l">' + esc(l.type || '—') + '</td>'
+      + '<td class="l">' + esc(l.buyerName || '—') + '</td>'
+      + '<td class="c' + (expired ? ' b' : '') + '">' + FDP(l.expiryDate) + (expired ? ' (expired)' : '') + '</td>'
+      + '<td class="r">' + FU(usd) + '</td>'
+      + '<td class="r">' + (acc ? FU(acc) : '—') + '</td>'
+      + '<td class="r b">' + FU(rem) + '</td>'
+      + '<td class="r">' + TKp(rem * rate) + '</td>'
+      + ptTd(l)
+      + '<td class="l sm">' + esc(l.remarks || '') + '</td></tr>';
+  }).join('');
+  var openCols = 12 + (both ? 1 : 0) + (showParty ? 1 : 0);
+  if (!openRows.length) openBody = '<tr><td colspan="' + openCols + '" class="c" style="color:#86868b;padding:14px">No opened LCs</td></tr>';
+  var lead = 7 + (both ? 1 : 0); // columns before "LC Value"
+  var openHtml = '<div class="block-title">Opened LCs</div>'
+    + '<table><thead><tr><th>#</th>' + coTh + '<th>Date</th><th>LC No.</th><th>Supplier</th><th>Type</th><th>Buyer</th><th>Expiry</th>'
+    + '<th class="r">LC Value (USD)</th><th class="r">Accepted (USD)</th><th class="r">Remaining (USD)</th><th class="r">Remaining (BDT)</th>' + ptTh + '<th>Remarks</th></tr></thead>'
+    + '<tbody>' + openBody + '</tbody>'
+    + '<tfoot><tr class="total"><td class="r" colspan="' + lead + '">Total</td><td class="r">' + FU(oUsd) + '</td><td class="r">' + FU(oAcc) + '</td><td class="r">' + FU(oRem) + '</td><td class="r">' + TKp(oRemBdt) + '</td><td colspan="' + (1 + (showParty ? 1 : 0)) + '"></td></tr></tfoot></table>';
+
+  // ── Accepted Bills, grouped by maturity month ──
+  var accRows = getAcceptedBillRows().filter(function(a){ return inCo(lcOf(a.bankLcId)); });
+  var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function mKey(a){ return a.maturityDate ? String(a.maturityDate).split('T')[0].slice(0,7) : 'none'; }
+  var accCols = 9 + (both ? 1 : 0) + (showParty ? 1 : 0);
+  var aUsd = 0, aBdt = 0, lastKey = null, n = 0;
+  var accBody = accRows.map(function(a){
+    var l = lcOf(a.bankLcId), usd = NUM(a.usd), bdt = usd * rate, key = mKey(a), out = '';
+    if (key !== lastKey) {
+      lastKey = key;
+      var mTot = accRows.filter(function(r){ return mKey(r) === key; }).reduce(function(s, r){ return s + NUM(r.usd) * rate; }, 0);
+      var label = key === 'none' ? 'No maturity date set' : MONTHS[parseInt(key.split('-')[1], 10) - 1] + ' ' + key.split('-')[0];
+      out += '<tr class="month"><td colspan="' + accCols + '"><span>' + label + '</span><span class="mt">' + TKp(mTot) + ' due</span></td></tr>';
+    }
+    n++; aUsd += usd; aBdt += bdt;
+    var due = a.maturityDate && String(a.maturityDate).split('T')[0] < today;
+    return out + '<tr><td class="c">' + n + '</td>' + coTd(l)
+      + '<td class="l b nw">' + esc(l.lcNo || a.lcNo || '—') + '</td>'
+      + '<td class="l">' + esc(l.supplier || '—') + '</td>'
+      + '<td class="l">' + esc(l.buyerName || '—') + '</td>'
+      + '<td class="c">' + FDP(a.date) + '</td>'
+      + '<td class="c b">' + FDP(a.maturityDate) + (due ? ' — DUE' : '') + '</td>'
+      + '<td class="r">' + FU(usd) + '</td>'
+      + '<td class="r b">' + TKp(bdt) + '</td>'
+      + '<td class="r">' + FU(Math.max(0, NUM(l.usd) - NUM(l.acceptedUSD))) + '</td>'
+      + ptTd(l) + '</tr>';
+  }).join('');
+  if (!accRows.length) accBody = '<tr><td colspan="' + accCols + '" class="c" style="color:#86868b;padding:14px">No accepted bills awaiting payment</td></tr>';
+  var accLead = 5 + (both ? 1 : 0);
+  var accHtml = '<div class="block-title">Accepted Bills — Awaiting Payment</div>'
+    + '<table><thead><tr><th>#</th>' + coTh + '<th>LC No.</th><th>Supplier</th><th>Buyer</th><th>Accept Date</th><th>Maturity</th>'
+    + '<th class="r">USD</th><th class="r">BDT</th><th class="r">LC Remaining (USD)</th>' + ptTh + '</tr></thead>'
+    + '<tbody>' + accBody + '</tbody>'
+    + '<tfoot><tr class="total"><td class="r" colspan="' + (accLead + 1) + '">Total Liability</td><td class="r">' + FU(aUsd) + '</td><td class="r">' + TKp(aBdt) + '</td><td colspan="' + (1 + (showParty ? 1 : 0)) + '"></td></tr></tfoot></table>';
+
+  // ── Summary (limit applies to both companies together, so it's only shown for "Both") ──
+  var usedAll = BANK.lcs.filter(function(l){ return l.status !== 'paid' && inCo(l); }).reduce(function(s, l){ return s + NUM(l.usd) * rate; }, 0);
+  var limit = BANK.settings.limit || 0;
+  var summary = '<div class="combined-box"><div class="combined-row">'
+    + '<div class="combined-stat"><div class="lbl">Total Liability (accepted, unpaid)</div><div class="val">' + TKp(aBdt) + '</div></div>'
+    + '<div class="combined-stat"><div class="lbl">Opened, unpaid (full LC value)</div><div class="val">' + TKp(usedAll) + '</div></div>'
+    + (both && limit ? '<div class="combined-stat"><div class="lbl">Limit used</div><div class="val">' + Math.round(usedAll / limit * 100) + '% of ' + TKp(limit) + '</div></div>' : '')
+    + '</div></div>';
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Banking — ' + esc(printName) + '</title><style>'
+    + '*{box-sizing:border-box;margin:0;padding:0}'
+    + 'html{-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+    + 'body{font-family:"Helvetica Neue",Arial,sans-serif;font-size:9.5px;color:#2b2b2b;background:#fff;padding:12mm}'
+    + '.hdr{text-align:center;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid #CC785C}'
+    + '.hdr .company{font-family:Georgia,"Times New Roman",serif;font-size:22px;font-weight:700;letter-spacing:1.5px;color:#1d1d1f}'
+    + '.hdr .title{font-size:11px;font-weight:600;letter-spacing:2px;color:#CC785C;margin-top:6px;text-transform:uppercase}'
+    + '.hdr .meta{font-size:10px;color:#6e6e73;margin-top:5px}'
+    + '.combined-box{border:1.5px solid #CC785C;border-radius:8px;padding:10px 16px;margin-bottom:14px;background:#FBF4EF}'
+    + '.combined-row{display:flex;gap:40px}'
+    + '.combined-stat .lbl{font-size:9px;font-weight:600;color:#6e6e73;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}'
+    + '.combined-stat .val{font-size:17px;font-weight:800;color:#1d1d1f}'
+    + '.block-title{font-size:11px;font-weight:700;color:#CC785C;text-transform:uppercase;letter-spacing:.5px;margin:14px 0 5px}'
+    + 'table{width:100%;border-collapse:collapse;margin-bottom:4px}'
+    + 'thead th{background:#FBF4EF;color:#6e6e73;padding:6px 5px;font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;border-bottom:1.5px solid #1d1d1f;text-align:left}'
+    + 'thead th.r{text-align:right}'
+    + 'tbody td{border-bottom:1px solid #ececea;padding:5px 5px;font-size:9.5px;vertical-align:top}'
+    + 'td.l{text-align:left}td.c{text-align:center;white-space:nowrap}td.r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}td.b{font-weight:700}td.nw{white-space:nowrap}td.sm{font-size:8.5px;color:#555}'
+    + 'tr.month td{background:#F4F3EE;font-weight:700;font-size:10px;padding:6px 5px;border-top:1.5px solid #d8d5c8}'
+    + 'tr.month .mt{float:right;color:#8a5a1f}'
+    + 'tr.total td{background:#FBF4EF;font-weight:700;border-top:1.5px solid #CC785C;border-bottom:1.5px solid #CC785C;font-size:10px}'
+    + '.ft{margin-top:12px;padding-top:6px;border-top:1px solid #E8DFD5;font-size:8px;color:#86868b;display:flex;justify-content:space-between}'
+    + '@page{size:A4 landscape;margin:10mm}'
+    + '@media print{body{padding:0}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid}tr.month{page-break-after:avoid;break-after:avoid}tr.total{page-break-before:avoid;break-before:avoid}}'
+    + '</style></head><body>'
+    + '<div class="hdr"><div class="company">' + esc(printName) + '</div>'
+    + '<div class="title">Banking — LC Position</div>'
+    + '<div class="meta">As of ' + FDP(today) + ' &middot; BDT at ৳' + rate + ' per USD</div></div>'
+    + summary
+    + (showOpen ? openHtml : '')
+    + (showAcc ? accHtml : '')
+    + '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>' + esc(printName) + ' — Banking</span></div>'
+    + '</body></html>';
+
+  cm('m-bank-print');
+  var win = window.open('', '_blank');
+  if (!win) { showAlert('Allow pop-ups to print.'); return; }
+  win.document.open(); win.document.write(html); win.document.close();
+  var _printedB = false;
+  win.onload = function(){ win.scrollTo(0,0); setTimeout(function(){ if(!_printedB){_printedB=true;win.print();} }, 300); };
+  setTimeout(function(){ try { if(!_printedB){_printedB=true;win.scrollTo(0,0);win.print();} } catch(e){} }, 800);
 }
 
 // ── Progress bar ──
@@ -3657,7 +3949,7 @@ function filterBLCType() {
   dd.style.left  = rect.left+'px';
   dd.style.width = rect.width+'px';
   dd.innerHTML = filtered.map(function(t){
-    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)" onmousedown="pickBLCType(\'' + t + '\')">' + t + '</div>';
+    return '<div style="padding:9px 12px;cursor:pointer;font-size:13px;color:var(--tx);border-bottom:1px solid var(--bdr)" onmousedown="pickBLCType(\'' + jsq(t) + '\')">' + esc(t) + '</div>';
   }).join('');
   dd.style.display = filtered.length ? '' : 'none';
 }
@@ -3717,7 +4009,7 @@ function openAddBankLC() {
   BANK.editBankLcId = null;
   document.getElementById('bank-lc-title').textContent = 'Add LC';
   document.getElementById('bank-lc-save-btn').textContent = 'Save LC';
-  document.getElementById('blc-date').value    = new Date().toISOString().split('T')[0];
+  document.getElementById('blc-date').value    = todayISO();
   document.getElementById('blc-company').value = 'MT Sweaters';
   document.getElementById('blc-lcno').value    = '';
   document.getElementById('blc-type').value    = '';
@@ -3783,24 +4075,34 @@ async function svBankLC() {
   var editedDebitRec = null;  // built now, saved in background below
   if (BANK.editBankLcId) {
     rec = BANK.lcs.find(function(l){return l.id===BANK.editBankLcId}); if(!rec) return;
+    // Remember how the linked Cash LC entry is identified BEFORE editing —
+    // the lookup below used to run after the LC number/party were already
+    // overwritten, so changing the LC number here silently broke the link.
+    var oldLcNo = rec.lcNo, oldCashPartyId = rec.cashPartyId;
     rec.date=date; rec.company=company; rec.lcNo=lcNo; rec.type=type;
     rec.buyerName=buyerName; rec.expiryDate=expiryDate; rec.usd=usd; rec.bdt=bdt;
     rec.remarks=remarks; rec.supplier=supplier; rec.isCash=isCash?'yes':'no';
     rec.cashPartyId=cashPartyId; rec.cashPartyType=cashPartyType;
     // If editing a cash LC — also update the old system debit (build now, save after modal closes)
-    if (rec.isCash==='yes' && rec.cashPartyId) {
+    if (rec.isCash==='yes' && oldCashPartyId) {
       editedDebitRec = ST.debits.find(function(d){
-        return String(d.partyId)===String(rec.cashPartyId) && String(d.lc)===String(rec.lcNo);
+        return String(d.partyId)===String(oldCashPartyId) && String(d.lc)===String(oldLcNo);
       });
       if (editedDebitRec) {
+        editedDebitRec.lc   = lcNo;
         editedDebitRec.usd  = usd;
+        // Keep the Cash LC's own BDT in step with the new USD at its own rate
+        if (NUM(editedDebitRec.rate)) editedDebitRec.bdt = usd * NUM(editedDebitRec.rate);
         editedDebitRec.date = date;
         editedDebitRec.notes = remarks;
         editedDebitRec.company = supplier; // keep Cash LC's supplier in sync with Banking's
-        if (supplier) saveNewCompany(supplier);
-  if (buyerName) registerNewBLCBuyer(buyerName); // persist for next-time suggestions
-        if (ST.cParty === rec.cashPartyId) { rDT(); renderPartyPage(); }
+        editedDebitRec.bankCompany = company;
+        if (ST.cParty === editedDebitRec.partyId) { rDT(); renderPartyPage(); }
       }
+    }
+    if (String(oldLcNo) !== String(lcNo)) {
+      // Keep this LC's acceptance records labelled with the new number too
+      BANK.acceptances.forEach(function(a){ if (String(a.bankLcId) === String(rec.id)) a.lcNo = lcNo; });
     }
   } else {
     rec = { id:UID(), date, company, lcNo, type, buyerName, expiryDate, usd, bdt,
@@ -3831,6 +4133,10 @@ async function svBankLC() {
     if (newDebitRec)    await api('saveDebit', newDebitRec);
     if (editedDebitRec) await api('editDebit', editedDebitRec);
     await api('saveBankLC', rec);
+    if (BANK.editBankLcId && typeof oldLcNo !== 'undefined' && String(oldLcNo) !== String(lcNo)) {
+      var relabel = BANK.acceptances.filter(function(a){ return String(a.bankLcId) === String(rec.id); });
+      for (var ri = 0; ri < relabel.length; ri++) await api('saveAcceptance', relabel[ri]);
+    }
     showSync('ok','Saved');
   } catch(e) { showSync('err','Save failed'); }
 }
@@ -3945,7 +4251,7 @@ function openBankAccept(bankLcId) {
   BANK._acceptLcId = bankLcId;
   document.getElementById('ba-lc-no').textContent   = String(l.lcNo) + ' \u2014 '+FU(NUM(l.usd));
   document.getElementById('ba-available').textContent= FU(remaining)+' remaining';
-  document.getElementById('ba-date').value      = new Date().toISOString().split('T')[0];
+  document.getElementById('ba-date').value      = todayISO();
   document.getElementById('ba-maturity').value  = '';
   document.getElementById('ba-remarks').value   = '';
   // Pre-fill with full remaining amount (95% of the time this is what's needed)
@@ -4007,7 +4313,7 @@ async function materializeGhostAcceptance(acceptId) {
   var usd = NUM(l.acceptedUSD);
   var rec = {
     id: UID(), bankLcId: l.id, lcNo: String(l.lcNo),
-    date: l.date || new Date().toISOString().split('T')[0],
+    date: l.date || todayISO(),
     maturityDate: '', usd: usd, bdt: usd * rate,
     status: 'pending', paidDate: '', remarks: 'Auto-repaired \u2014 please set maturity date'
   };
@@ -4027,7 +4333,7 @@ async function openBankPay(acceptId) {
   document.getElementById('bp-lc-no').textContent  = l.lcNo||a.lcNo||'\u2014';
   document.getElementById('bp-amount').textContent = FU(NUM(a.usd))+' / '+F(NUM(a.bdt));
   document.getElementById('bp-maturity').textContent = FD(a.maturityDate);
-  document.getElementById('bp-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('bp-date').value = todayISO();
   om('m-bank-pay');
 }
 
@@ -4078,15 +4384,24 @@ async function confirmBankPay() {
   var otherPendingForThisLC = l.id ? BANK.acceptances.some(function(x){
     return String(x.bankLcId) === String(l.id) && x.status === 'pending';
   }) : false;
-  var lcFullySettled = !otherPendingForThisLC;
+  // Also require the WHOLE LC to have been accepted. Previously paying the
+  // only accepted document on a partly-accepted LC (e.g. $400 of $1,000)
+  // marked the entire LC paid, and the $600 still to be accepted vanished
+  // from Opened LCs and from the limit.
+  var nothingLeftToAccept = !l.id || (NUM(l.usd) - NUM(l.acceptedUSD)) <= 0.01;
+  var lcFullySettled = !otherPendingForThisLC && nothingLeftToAccept;
   // Build paid bill record
   var paidRec = {
     id:UID(), bankLcId:a.bankLcId, lcNo:l.lcNo||a.lcNo,
     company:l.company||'', buyerName:l.buyerName||'', type:l.type||'',
     accDate:a.date, maturityDate:a.maturityDate, paidDate,
     usd:a.usd, bdt:a.bdt, isCash:l.isCash||'no',
-    cashPartyId:l.cashPartyId||'', remarks:a.remarks||''
+    cashPartyId:l.cashPartyId||'', remarks:a.remarks||'',
+    acceptanceId:a.id // lets Undo Payment restore this exact record
   };
+  // Available to search (and its Undo Payment) straight away — before, a
+  // payment made here only showed up in search after a full reload.
+  BANK.paidBills.push(paidRec);
   // Update old system bank payment if cash LC — only once every document on
   // this LC has been paid, not just this one — build the change locally,
   // save in background below
@@ -4138,13 +4453,17 @@ async function undoBankPayment() {
 
   var l = BANK.lcs.find(function(x){ return x.id === pb.bankLcId; });
 
-  // Restore the acceptance record as pending
+  // Restore the acceptance record as pending — reusing the original
+  // record's id when the paid bill knows it, so no duplicate is created
   var restoredAcc = {
-    id: UID(), bankLcId: pb.bankLcId, lcNo: pb.lcNo,
+    id: pb.acceptanceId || UID(), bankLcId: pb.bankLcId, lcNo: pb.lcNo,
     date: pb.accDate || pb.paidDate, maturityDate: pb.maturityDate || '',
     usd: NUM(pb.usd), bdt: NUM(pb.bdt), status: 'pending', paidDate: '',
     remarks: pb.remarks || ''
   };
+  // Drop any local copy of that same record still marked paid, so there is
+  // exactly one object per acceptance id
+  BANK.acceptances = BANK.acceptances.filter(function(x){ return x.id !== restoredAcc.id; });
   BANK.acceptances.push(restoredAcc);
   BANK.paidBills = BANK.paidBills.filter(function(x){ return x.id !== pb.id; });
 
@@ -4172,7 +4491,15 @@ async function undoBankPayment() {
   showSync('saving', 'Undoing payment...');
   try {
     if (debitToSync) await api('updateDebit', { id: debitToSync.id, field: 'payment', value: '' });
-    await api('undoPayment', { paidBillId: pb.id, acceptanceRecord: restoredAcc, updatedLc: l });
+    var undoRes = await api('undoPayment', { paidBillId: pb.id, acceptanceRecord: restoredAcc, updatedLc: l });
+    // The server may have restored the ORIGINAL acceptance row (older paid
+    // bills don't carry its id) — use that id from now on.
+    if (undoRes && undoRes.restoredAcceptanceId && undoRes.restoredAcceptanceId !== restoredAcc.id) {
+      var realId = undoRes.restoredAcceptanceId;
+      BANK.acceptances = BANK.acceptances.filter(function(x){ return x === restoredAcc || x.id !== realId; });
+      restoredAcc.id = realId;
+      renderBankingPage();
+    }
     showSync('ok', 'Payment undone');
   } catch(e) { showSync('err', 'Save failed'); }
 }
@@ -4184,7 +4511,7 @@ async function syncUndoAcceptToBanking(lcNo, partyId) {
   });
   if (!bankLc) return;
   // Find the pending acceptance for this LC
-  var accEntry = BANK.acceptances.find(function(a){
+  var accEntries = BANK.acceptances.filter(function(a){
     return String(a.bankLcId)===String(bankLc.id) && a.status!=='paid';
   });
   // Update local state
@@ -4193,9 +4520,12 @@ async function syncUndoAcceptToBanking(lcNo, partyId) {
   });
   bankLc.acceptedUSD = 0;
   bankLc.status = 'open';
-  // Save to sheets
-  if (accEntry) {
-    try { await api('deleteAcceptance', { id: accEntry.id, updatedLc: bankLc }); } catch(e){}
+  // Save to sheets — delete EVERY pending acceptance removed above (only the
+  // first one used to be deleted on the server; extras came back on reload)
+  if (accEntries.length) {
+    for (var i = 0; i < accEntries.length; i++) {
+      try { await api('deleteAcceptance', { id: accEntries[i].id, updatedLc: bankLc }); } catch(e){}
+    }
   } else {
     // No BANK_ACCEPTANCES entry — just update the BANK_LCS status
     try { await api('editBankLC', bankLc); } catch(e){}
@@ -4250,7 +4580,7 @@ async function syncAcceptToBanking(debitId, lcNo, partyId, maturityDate) {
   var rate = BANK.settings.rate || 122.5;
   var rec  = {
     id:UID(), bankLcId:bankLc.id, lcNo:String(lcNo),
-    date:new Date().toISOString().split('T')[0],
+    date:todayISO(),
     maturityDate:maturityDate||'', usd:usd, bdt:usd*rate,
     status:'pending', paidDate:'', remarks:''
   };
@@ -4276,7 +4606,7 @@ async function syncPaymentToBanking(lcNo, partyId) {
   });
   if (!bankLc) return;
   var pendingAcc = BANK.acceptances.filter(function(a){return a.bankLcId===bankLc.id && a.status==='pending'});
-  var paidDate = new Date().toISOString().split('T')[0];
+  var paidDate = todayISO();
 
   for (var i=0; i<pendingAcc.length; i++) {
     var a = pendingAcc[i];
@@ -4284,7 +4614,8 @@ async function syncPaymentToBanking(lcNo, partyId) {
       id:UID(), bankLcId:bankLc.id, lcNo:bankLc.lcNo,
       company:bankLc.company||'', buyerName:'', type:'',
       accDate:a.date, maturityDate:a.maturityDate, paidDate:paidDate,
-      usd:a.usd, bdt:a.bdt, isCash:'yes', cashPartyId:bankLc.cashPartyId, remarks:''
+      usd:a.usd, bdt:a.bdt, isCash:'yes', cashPartyId:bankLc.cashPartyId, remarks:'',
+      acceptanceId:a.id
     };
     a.status='paid';
     BANK.paidBills.push(paidRec); // so it's immediately searchable via the Paid LC popup, no refresh needed
@@ -4317,6 +4648,43 @@ async function syncPaymentToBanking(lcNo, partyId) {
 }
 
 
+
+// ── Sync: Cash LC marked back to "Due" → undo the payment in Banking ──
+// The mirror of syncPaymentToBanking. Without it, un-paying in Cash LC left
+// Banking showing the LC as paid, and the next sync turned it into a ghost.
+async function syncUnpayToBanking(lcNo, partyId) {
+  var bankLc = BANK.lcs.find(function(l){
+    return String(l.lcNo)===String(lcNo) && l.isCash==='yes' && String(l.cashPartyId)===String(partyId);
+  });
+  if (!bankLc) return;
+  var bills = BANK.paidBills.filter(function(pb){ return String(pb.bankLcId) === String(bankLc.id); });
+  var jobs = bills.map(function(pb){
+    var acc = {
+      id: pb.acceptanceId || UID(), bankLcId: pb.bankLcId, lcNo: pb.lcNo,
+      date: pb.accDate || pb.paidDate, maturityDate: pb.maturityDate || '',
+      usd: NUM(pb.usd), bdt: NUM(pb.bdt), status: 'pending', paidDate: '', remarks: pb.remarks || ''
+    };
+    BANK.acceptances = BANK.acceptances.filter(function(x){ return x.id !== acc.id; });
+    BANK.acceptances.push(acc);
+    return { pb: pb, acc: acc };
+  });
+  BANK.paidBills = BANK.paidBills.filter(function(pb){ return String(pb.bankLcId) !== String(bankLc.id); });
+  var accUSD = NUM(bankLc.acceptedUSD);
+  bankLc.status = accUSD <= 0 ? 'open' : (accUSD >= NUM(bankLc.usd) - 0.01 ? 'accepted' : 'partial');
+  if (document.getElementById('page-banking').classList.contains('active')) renderBankingPage();
+  try {
+    for (var i = 0; i < jobs.length; i++) {
+      var res = await api('undoPayment', { paidBillId: jobs[i].pb.id, acceptanceRecord: jobs[i].acc, updatedLc: bankLc });
+      if (res && res.restoredAcceptanceId && res.restoredAcceptanceId !== jobs[i].acc.id) {
+        var realId = res.restoredAcceptanceId, keep = jobs[i].acc;
+        BANK.acceptances = BANK.acceptances.filter(function(x){ return x === keep || x.id !== realId; });
+        keep.id = realId;
+      }
+    }
+    if (!jobs.length) await api('editBankLC', bankLc);
+  } catch(e) { showSync('err', 'Banking update failed — press Refresh on Banking'); }
+  if (document.getElementById('page-banking').classList.contains('active')) renderBankingPage();
+}
 
 // ── Banking inline search with suggestions ──
 function bankSuggest() {
@@ -4550,28 +4918,51 @@ function updateCompanyBreakdown(rate) {
 // ═══════════════════════════════════════════════════════
 // FEATURE 10: AUTO-BACKUP
 // ═══════════════════════════════════════════════════════
-function downloadBackup() {
+async function downloadBackup() {
+  // The backup used to contain only Cash LC and Banking — Loans, FDR,
+  // Creditors, the locker log and Liability were silently left out.
+  // Make sure every module is loaded first, then include all of them.
+  showSync('saving', 'Preparing backup...');
+  await Promise.all([
+    ensureModuleLoaded(LOANS, loadLoansData, 'loans'),
+    ensureModuleLoaded(FDR, loadFDRData, 'FDR data'),
+    ensureModuleLoaded(CREDITORS, loadCreditorsData, 'creditors'),
+    ensureModuleLoaded(LIABILITY, loadLiabilityData, 'liabilities'),
+  ]);
+  var missing = [['Loans', LOANS], ['FDR', FDR], ['Creditors', CREDITORS], ['Liability', LIABILITY]]
+    .filter(function(m){ return !m[1]._loaded; }).map(function(m){ return m[0]; });
   var backup = {
     timestamp: new Date().toISOString(),
-    version: '1.0',
+    version: '2.0',
     parties:          ST.parties,
     debits:           ST.debits,
     credits:          ST.credits,
     bankLCs:          BANK.lcs,
     bankAcceptances:  BANK.acceptances,
+    bankPaidBills:    BANK.paidBills,
     bankSettings:     BANK.settings,
+    loans:            LOANS.loans,
+    machineLoans:     LOANS.machineLoans,
+    loanSettings:     LOANS.settings,
+    fdrs:             FDR.fdrs,
+    creditors:        CREDITORS.items,
+    creditorRates:    CREDITORS.rates,
+    lockerLog:        CREDITORS.lockerLog,
+    liabilities:      LIABILITY.items,
+    notLoaded:        missing,
   };
   var json = JSON.stringify(backup, null, 2);
   var blob = new Blob([json], {type: 'application/json'});
   var url  = URL.createObjectURL(blob);
   var a    = document.createElement('a');
   a.href   = url;
-  a.download = 'lc-ledger-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.download = 'lc-ledger-backup-' + todayISO() + '.json';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showSync('ok', 'Backup downloaded');
+  if (missing.length) showSync('err', 'Backup downloaded, but missing: ' + missing.join(', ') + ' (could not load)');
+  else showSync('ok', 'Backup downloaded — all modules');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4704,7 +5095,11 @@ function renderLoanSummary() {
     + '</div></div>';
 
   // ── 2. MACHINE LOAN — medium prominence ──
-  var machineTotal = LOANS.machineLoans.reduce(function(s, m){ return s + NUM(m.bdt); }, 0);
+  // Same basis as the Machine Loan table: USD x the CURRENT rate. The stored
+  // per-row bdt is from the day each loan was added, so the old total here
+  // stopped matching the table as soon as the rate was changed.
+  var mlRate = LOANS.settings.machineRate || 122.5;
+  var machineTotal = LOANS.machineLoans.reduce(function(s, m){ return s + NUM(m.usd) * mlRate; }, 0);
   var machineCard = '<div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r2);padding:18px 24px;display:flex;justify-content:space-between;align-items:center">'
     + '<div><div style="font-size:13px;font-weight:600;color:var(--tx2)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:2px"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Machine Loan <span style="font-size:11px;font-weight:400;color:var(--tx3)">(combined — both companies)</span></div></div>'
     + '<div style="font-size:26px;font-weight:700;color:var(--bl);font-family:\'DM Mono\',monospace">' + F(machineTotal) + '</div>'
@@ -4916,7 +5311,9 @@ async function addMainLoanRow(coKey) {
   var rec = { id: UID(), company: c.name, loanType: loanType, accountNo: accountNo, amount: amount, installment: installment, lastVerified: new Date().toISOString() };
   LOANS.loans.push(rec);
   accInput.value = ''; amtInput.value = '';
-  var dupWarn2 = document.getElementById('lt-dup-warn-' + type + '-' + coKey); if (dupWarn2) dupWarn2.style.display = 'none'; if (instInput) instInput.value = '';
+  if (instInput) instInput.value = '';
+  // (This line used to reference an undefined variable "type", which threw
+  // an error and stopped every Main Loan from being displayed or saved.)
   var dupWarn1 = document.getElementById('lt-dup-warn-main-' + coKey); if (dupWarn1) dupWarn1.style.display = 'none';
   renderAllLoanTables(); renderLoanSummary();
   showSync('saving', 'Saving...');
@@ -5011,6 +5408,11 @@ async function updateLoanField(id, field, value) {
     }
     loan.amount = numVal;
     loan.lastVerified = new Date().toISOString(); // confirming the amount counts as verifying it against the bank statement
+    // Refresh just this row's "Checked this week" tag (a full re-render would
+    // steal focus from the next field you tabbed into)
+    var _tagEl = document.querySelector('#loanrow-' + id + ' td.mn div');
+    if (_tagEl) _tagEl.innerHTML = verifiedTag(loan);
+    updateUncheckedCountBadge();
   } else if (field === 'installment') {
     loan.installment = NUM(value);
   } else if (field === 'loanType') {
@@ -5044,7 +5446,7 @@ function renderMachineLoanTable() {
   var tbody = document.getElementById('machine-loan-tbody');
   if (!tbody) return;
   var rate = LOANS.settings.machineRate || 122.5;
-  var today = new Date().toISOString().split('T')[0];
+  var today = todayISO();
   var rows = LOANS.machineLoans.slice().sort(function(a,b){
     return String(a.maturityDate||'').localeCompare(String(b.maturityDate||''));
   });
@@ -5167,7 +5569,7 @@ function loanSuggest() {
         id: m.id, rowId: 'loanrow-' + m.id,
         accountNo: m.accountNo, company: 'Combined',
         type: 'Machine Loan (' + (m.machineType||'—') + ')',
-        amount: NUM(m.usd) * NUM(m.rate), isPad: false
+        amount: NUM(m.usd) * (LOANS.settings.machineRate || 122.5), isPad: false
       });
     }
   });
@@ -5212,6 +5614,7 @@ function printLoanTable(type, coKey) {
   var co = c ? c.name : '';
   var label = isMachine ? 'Machine Loan (Combined)' : (type === 'main' ? 'Main Loan (HBL + Term)' : LOAN_TYPE_LABELS[type]);
   var titleSub = isMachine ? 'Both companies' : co;
+  var printName = isMachine ? GROUP_PRINT_NAME : (COMPANY_PRINT_NAMES[co] || GROUP_PRINT_NAME);
 
   var rows, headHtml, bodyHtml, totalLabel, totalVal;
 
@@ -5254,7 +5657,7 @@ function printLoanTable(type, coKey) {
 
   if (!rows.length) bodyHtml = '<tr><td colspan="7" class="c" style="color:#86868b;padding:16px">No entries</td></tr>';
 
-  var today = new Date().toISOString().split('T')[0];
+  var today = todayISO();
   function FDP(d){ if(!d) return ''; var p = String(d).split('T')[0].split('-'); return p[2]+'/'+p[1]+'/'+p[0].slice(2); }
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + label + '</title>';
@@ -5276,7 +5679,7 @@ function printLoanTable(type, coKey) {
   html += '@page{size:A4 portrait;margin:16mm 15mm 28mm 15mm}';
   html += '@media print{body{padding:0}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid}tr.total{page-break-before:avoid;break-before:avoid}}';
   html += '</style></head><body>';
-  html += '<div class="hdr"><div class="company">XYX FASHION</div>';
+  html += '<div class="hdr"><div class="company">' + esc(printName) + '</div>';
   html += '<div class="title">' + label + '</div>';
   html += '<div class="meta">' + titleSub + ' &middot; As of ' + FDP(today) + '</div></div>';
   html += '<table><thead>' + headHtml + '</thead><tbody>' + bodyHtml + '</tbody>';
@@ -5285,7 +5688,7 @@ function printLoanTable(type, coKey) {
   var footTrailingCell = isMachine ? '<td></td>' : (type === 'main' ? '<td></td>' : '');
   html += '<tfoot><tr class="total"><td class="r" colspan="' + footColspan + '">' + totalLabel + '</td><td class="r">' + totalVal + '</td>' + footTrailingCell + '</tr></tfoot>';
   html += '</table>';
-  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>XYX FASHION \u2014 Loan Tracker</span></div>';
+  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>' + esc(printName) + ' \u2014 Loan Tracker</span></div>';
   html += '</body></html>';
 
   var win = window.open('', '_blank');
@@ -5298,7 +5701,7 @@ function printLoanTable(type, coKey) {
 
 // ── Print everything at once: combined totals + every company's tables + machine loan ──
 function printAllLoans() {
-  var today = new Date().toISOString().split('T')[0];
+  var today = todayISO();
   function FDP(d){ if(!d) return ''; var p = String(d).split('T')[0].split('-'); return p[2]+'/'+p[1]+'/'+p[0].slice(2); }
 
   function sumAll(type) {
@@ -5404,13 +5807,13 @@ function printAllLoans() {
   html += '@page{size:A4 portrait;margin:16mm 15mm 28mm 15mm}';
   html += '@media print{body{padding:0}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid}tr.total{page-break-before:avoid;break-before:avoid}.pagebreak{page-break-before:always;break-before:page}}';
   html += '</style></head><body>';
-  html += '<div class="hdr"><div class="company">XYX FASHION</div>';
+  html += '<div class="hdr"><div class="company">' + esc(GROUP_PRINT_NAME) + '</div>';
   html += '<div class="title">Complete Loan Summary</div>';
   html += '<div class="meta">All companies &middot; As of ' + FDP(today) + '</div></div>';
   html += combinedHtml;
   html += companySections;
   html += machineSection;
-  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>XYX FASHION \u2014 Loan Tracker</span></div>';
+  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>' + esc(GROUP_PRINT_NAME) + ' \u2014 Loan Tracker</span></div>';
   html += '</body></html>';
 
   var win = window.open('', '_blank');
@@ -5627,6 +6030,7 @@ async function updateFDRAmount(id, value) {
   fdr.amount = NUM(value);
   fdr.lastVerified = new Date().toISOString(); // confirming the amount counts as verifying it against the bank statement
   renderFDRDetail();
+  updateFDRUncheckedBadge();
   showSync('saving', 'Saving...');
   try { await api('saveFDR', fdr); showSync('ok', 'Saved'); }
   catch(e) { showSync('err', 'Save failed'); }
@@ -5760,8 +6164,8 @@ var CREDITOR_CURRENCIES = [
   { code: 'USD', symbol: '$',      name: 'US Dollar' },
   { code: 'EUR', symbol: '\u20AC', name: 'Euro' },
   { code: 'GBP', symbol: '\u00A3', name: 'British Pound' },
-  { code: 'CNY', symbol: '\u00A5', name: 'Chinese Yuan / RMB' },
-  { code: 'JPY', symbol: '\u00A5', name: 'Japanese Yen' },
+  { code: 'CNY', symbol: 'CN\u00A5', name: 'Chinese Yuan / RMB' }, // CN¥ / JP¥ — both were a bare ¥,
+  { code: 'JPY', symbol: 'JP\u00A5', name: 'Japanese Yen' },         // so a yuan row and a yen row looked identical
   { code: 'AED', symbol: 'DH',     name: 'UAE Dirham' },
   { code: 'SAR', symbol: 'SR',     name: 'Saudi Riyal' },
   { code: 'QAR', symbol: 'QR',     name: 'Qatari Riyal' },
@@ -5807,6 +6211,39 @@ try {
 try {
   var _savedCredCategoryModes = JSON.parse(localStorage.getItem('lc_cred_category_modes') || '{}');
 } catch(e) { var _savedCredCategoryModes = {}; }
+
+// Custom categories and their Simple / Quantity x Rate mode are now kept in
+// the sheet as well, so every computer and phone agrees. (They used to live
+// only in this browser — on another device a custom Quantity x Rate
+// category showed as Simple, hiding its quantity and rate.) Categories this
+// browser knew about but the sheet didn't are uploaded once, automatically.
+function mergeCreditorCategoryMeta(data) {
+  var serverCats = (data && data.customCategories) || [];
+  var serverModes = (data && data.categoryModes) || {};
+  var hasServerMeta = !!(data && 'customCategories' in data);
+  var localOnlyCats = _savedCredCategories.filter(function(c){ return serverCats.indexOf(c) < 0; });
+  var localOnlyModes = {};
+  Object.keys(_savedCredCategoryModes).forEach(function(k){ if (serverModes[k] !== _savedCredCategoryModes[k]) localOnlyModes[k] = _savedCredCategoryModes[k]; });
+  serverCats.forEach(function(c){ if (_savedCredCategories.indexOf(c) < 0) _savedCredCategories.push(c); });
+  Object.keys(serverModes).forEach(function(k){ _savedCredCategoryModes[k] = serverModes[k]; });
+  try {
+    localStorage.setItem('lc_cred_categories', JSON.stringify(_savedCredCategories));
+    localStorage.setItem('lc_cred_category_modes', JSON.stringify(_savedCredCategoryModes));
+  } catch(e) {}
+  if (hasServerMeta && (localOnlyCats.length || Object.keys(localOnlyModes).length)) {
+    api('saveCreditorMeta', { categories: localOnlyCats, modes: localOnlyModes }).catch(function(){});
+  }
+}
+
+// BDT value of one creditor row at the current rates. If a currency has no
+// rate yet, the stored figure is kept rather than showing zero.
+function creditorBdtFor(c) {
+  var fx = creditorRate(c.currency || 'BDT');
+  if (!fx) return NUM(c.bdtAmount);
+  return getCreditorCategoryMode(c.category) === 'qty'
+    ? NUM(c.quantity) * NUM(c.rate) * fx
+    : NUM(c.amount) * fx;
+}
 
 function getCreditorCategories() {
   var fromItems = CREDITORS.items.map(function(c){ return c.category; }).filter(Boolean);
@@ -5866,6 +6303,10 @@ async function loadCreditorsData() {
     CREDITORS.rates = Object.assign({ BDT: 1 }, data.rates || {});
     CREDITORS.ratesLastUpdated = data.ratesLastUpdated || '';
     CREDITORS.lockerLog = logData.log || [];
+    mergeCreditorCategoryMeta(data);
+    // Show every BDT figure at today's rates (the stored figure can be from
+    // before the last rate refresh)
+    CREDITORS.items.forEach(function(c){ c.bdtAmount = creditorBdtFor(c); });
     await ensureLockerRows();
     // Only mark the module "loaded" now — after the locker rows are
     // guaranteed to exist. Setting this any earlier created a race: if the
@@ -5900,12 +6341,18 @@ function addCreditorCategory() {
   if (existing.includes(name)) { showAlert('That category already exists.'); return; }
   _savedCredCategories.push(name);
   try { localStorage.setItem('lc_cred_categories', JSON.stringify(_savedCredCategories)); } catch(e) {}
+  var modes = {};
   if (modeSel && modeSel.value === 'qty') {
     _savedCredCategoryModes[name] = 'qty';
+    modes[name] = 'qty';
     try { localStorage.setItem('lc_cred_category_modes', JSON.stringify(_savedCredCategoryModes)); } catch(e) {}
   }
   inp.value = '';
   renderCreditorsPage();
+  showSync('saving', 'Saving category...');
+  api('saveCreditorMeta', { categories: [name], modes: modes })
+    .then(function(){ showSync('ok', 'Category saved'); })
+    .catch(function(){ showSync('err', 'Category saved on this device only — check connection'); });
 }
 
 // ── Master render ──
@@ -5939,7 +6386,7 @@ function renderCreditorCategoryHTML(category) {
 function renderCreditorCategorySimpleHTML(category) {
   var rows = CREDITORS.items.filter(function(c){ return c.category === category; });
   var total = rows.reduce(function(s, c){ return s + NUM(c.bdtAmount); }, 0);
-  var safeCat = category.replace(/'/g, "\'");
+  var safeCat = jsq(category); // safe inside onclick even with an apostrophe
   var catKey = category.replace(/[^A-Za-z0-9]/g, '_');
 
   var bodyRows = rows.map(function(c) {
@@ -5962,7 +6409,7 @@ function renderCreditorCategorySimpleHTML(category) {
 
   return '<div class="sw" style="margin-bottom:18px">'
     + '<div style="padding:12px 18px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
-    + '<span style="font-size:14px;font-weight:650">' + category + '</span>'
+    + '<span style="font-size:14px;font-weight:650">' + esc(category) + '</span>'
     + '<div style="display:flex;align-items:center;gap:12px">'
     + '<span style="font-size:13px;color:var(--tx2)">Total: <strong style="font-family:\'DM Mono\',monospace;color:var(--ac)">' + fmtCreditorBDT(total) + '</strong></span>'
     + '<button class="btn bg bsm no-print" onclick="printCreditorCategory(\'' + safeCat + '\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:2px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Print</button>'
@@ -5992,7 +6439,7 @@ function renderCreditorCategorySimpleHTML(category) {
 function renderCreditorCategoryQtyHTML(category) {
   var rows = CREDITORS.items.filter(function(c){ return c.category === category; });
   var total = rows.reduce(function(s, c){ return s + NUM(c.bdtAmount); }, 0);
-  var safeCat = category.replace(/'/g, "\'");
+  var safeCat = jsq(category); // safe inside onclick even with an apostrophe
   var catKey = category.replace(/[^A-Za-z0-9]/g, '_');
 
   var bodyRows = rows.map(function(c) {
@@ -6019,7 +6466,7 @@ function renderCreditorCategoryQtyHTML(category) {
 
   return '<div class="sw" style="margin-bottom:18px">'
     + '<div style="padding:12px 18px;border-bottom:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'
-    + '<span style="font-size:14px;font-weight:650">' + category + ' <span style="font-size:11px;font-weight:400;color:var(--tx3)">(Quantity &times; Rate)</span></span>'
+    + '<span style="font-size:14px;font-weight:650">' + esc(category) + ' <span style="font-size:11px;font-weight:400;color:var(--tx3)">(Quantity &times; Rate)</span></span>'
     + '<div style="display:flex;align-items:center;gap:12px">'
     + '<span style="font-size:13px;color:var(--tx2)">Total: <strong style="font-family:\'DM Mono\',monospace;color:var(--ac)">' + fmtCreditorBDT(total) + '</strong></span>'
     + '<button class="btn bg bsm no-print" onclick="printCreditorCategory(\'' + safeCat + '\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:2px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Print</button>'
@@ -6180,25 +6627,27 @@ async function refreshCreditorRatesNow() {
     CREDITORS.ratesLastUpdated = result.lastUpdated || new Date().toISOString();
     // Recompute every entry's BDT equivalent against the new rates — qty-mode
     // entries (Quantity x Rate x currency) and simple-mode entries (Amount x
-    // currency) each use their own formula.
-    CREDITORS.items.forEach(function(c){
-      c.bdtAmount = (getCreditorCategoryMode(c.category) === 'qty')
-        ? NUM(c.quantity) * NUM(c.rate) * creditorRate(c.currency)
-        : NUM(c.amount) * creditorRate(c.currency);
-    });
-    for (var i = 0; i < CREDITORS.items.length; i++) {
-      await api('saveCreditor', CREDITORS.items[i]);
-    }
+    // currency) each use their own formula. Liability's USD rows use the
+    // same USD rate, so they're updated too (they used to be missed).
+    CREDITORS.items.forEach(function(c){ c.bdtAmount = creditorBdtFor(c); });
+    LIABILITY.items.forEach(function(l){ if (l.currency === 'USD') l.bdtAmount = NUM(l.usdAmount) * creditorRate('USD'); });
     renderCreditorRatesList();
     renderCreditorsPage();
-    showSync('ok', 'Rates refreshed \u2014 every entry recalculated');
+    if (document.getElementById('page-liability').classList.contains('active')) renderLiabilityPage();
+    if (!('recomputed' in result)) {
+      // Older Code.gs that doesn't re-price the sheet itself: save the rows
+      // (one batched request, falling back to one-by-one if needed)
+      try { await api('saveCreditorsBatch', { items: CREDITORS.items }); }
+      catch (e2) { for (var i = 0; i < CREDITORS.items.length; i++) await api('saveCreditor', CREDITORS.items[i]); }
+    }
+    showSync('ok', 'Rates refreshed — every entry recalculated');
   } catch(e) { showSync('err', 'Save failed'); }
 }
 
 // ── Print a single category (ink-friendly portrait A4) ──
 function printCreditorCategory(category) {
   var rows = CREDITORS.items.filter(function(c){ return c.category === category; });
-  var today = new Date().toISOString().split('T')[0];
+  var today = todayISO();
   function FDP(d){ if(!d) return ''; var p = String(d).split('T')[0].split('-'); return p[2]+'/'+p[1]+'/'+p[0].slice(2); }
   var isQty = getCreditorCategoryMode(category) === 'qty';
 
@@ -6254,21 +6703,21 @@ function buildCreditorPrintHTML(title, headHtml, bodyHtml, total, today, FDP, is
   html += '@page{size:A4 portrait;margin:16mm 15mm 18mm 15mm}';
   html += '@media print{body{padding:0}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid}tr.total{page-break-before:avoid;break-before:avoid}}';
   html += '</style></head><body>';
-  html += '<div class="hdr"><div class="company">XYX FASHION</div>';
+  html += '<div class="hdr"><div class="company">' + esc(GROUP_PRINT_NAME) + '</div>';
   html += '<div class="title">' + title + '</div>';
   html += '<div class="meta">Various Creditors &middot; As of ' + FDP(today) + '</div></div>';
   html += '<table><thead>' + headHtml + '</thead>';
   html += '<tbody>' + bodyHtml + '</tbody>';
   html += '<tfoot><tr class="total"><td class="r" colspan="' + (isQty ? 6 : 4) + '">Total (BDT)</td><td class="r">' + fmtCreditorBDT(total) + '</td><td></td></tr></tfoot>';
   html += '</table>';
-  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>XYX FASHION \u2014 Various Creditors</span></div>';
+  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>' + esc(GROUP_PRINT_NAME) + ' \u2014 Various Creditors</span></div>';
   html += '</body></html>';
   return html;
 }
 
 // ── Print everything at once ──
 function printAllCreditors() {
-  var today = new Date().toISOString().split('T')[0];
+  var today = todayISO();
   function FDP(d){ if(!d) return ''; var p = String(d).split('T')[0].split('-'); return p[2]+'/'+p[1]+'/'+p[0].slice(2); }
   var categories = getCreditorCategories();
   var grandTotal = 0;
@@ -6327,12 +6776,12 @@ function printAllCreditors() {
   html += '@page{size:A4 portrait;margin:16mm 15mm 18mm 15mm}';
   html += '@media print{body{padding:0}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid}tr.total{page-break-before:avoid;break-before:avoid}.pagebreak{page-break-before:always;break-before:page}}';
   html += '</style></head><body>';
-  html += '<div class="hdr"><div class="company">XYX FASHION</div>';
+  html += '<div class="hdr"><div class="company">' + esc(GROUP_PRINT_NAME) + '</div>';
   html += '<div class="title">Complete Creditors Summary</div>';
   html += '<div class="meta">All categories &middot; As of ' + FDP(today) + '</div></div>';
   html += '<div class="grand-box"><div class="grand-label">Grand Total \u2014 All Categories</div><div class="grand-val">' + fmtCreditorBDT(grandTotal) + '</div></div>';
   html += sections;
-  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>XYX FASHION \u2014 Various Creditors</span></div>';
+  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>' + esc(GROUP_PRINT_NAME) + ' \u2014 Various Creditors</span></div>';
   html += '</body></html>';
 
   var win = window.open('', '_blank');
@@ -6350,17 +6799,29 @@ function renderHomeLockerHTML() {
   var small = CREDITORS.items.find(function(c){ return c.category === 'HOME LOCKER' && String(c.name).trim().toLowerCase() === 'small locker'; });
   var big   = CREDITORS.items.find(function(c){ return c.category === 'HOME LOCKER' && String(c.name).trim().toLowerCase() === 'big locker'; });
   var rows = [small, big].filter(Boolean);
-  var total = rows.reduce(function(s, c){ return s + NUM(c.bdtAmount); }, 0);
+  // Any OTHER entry filed under HOME LOCKER (from before the two lockers were
+  // fixed) used to be hidden here while still counting in the Grand Total.
+  // Show it, so the page total and the Grand Total always agree, with a
+  // Remove button to clean it up.
+  var extras = CREDITORS.items.filter(function(c){ return c.category === 'HOME LOCKER' && c !== small && c !== big; });
+  var total = rows.concat(extras).reduce(function(s, c){ return s + NUM(c.bdtAmount); }, 0);
 
   var bodyRows = rows.map(function(c) {
     var lockerType = String(c.name).trim().toLowerCase() === 'small locker' ? 'small' : 'big';
     return '<tr id="loanrow-' + c.id + '">'
-      + '<td style="font-weight:700;font-size:14.5px">' + c.name + '</td>'
+      + '<td style="font-weight:700;font-size:14.5px">' + esc(c.name) + '</td>'
       + '<td class="r mn" style="font-weight:800;font-size:16px;color:var(--ac)">' + fmtCreditorBDT(c.bdtAmount) + '</td>'
       + '<td class="no-print" style="white-space:nowrap">'
         + '<button class="btn bp bsm" onclick="openLockerTx(\'' + lockerType + '\',\'' + c.id + '\')" style="margin-right:4px">Deposit / Withdraw</button>'
         + '<button class="btn bg bsm" onclick="openLockerHistory(\'' + lockerType + '\')">History</button>'
         + '</td>'
+      + '</tr>';
+  }).join('') + extras.map(function(c) {
+    return '<tr id="loanrow-' + c.id + '">'
+      + '<td style="font-size:13px"><span style="font-weight:700">' + esc(c.name || '—') + '</span>'
+        + ' <span style="font-size:10.5px;color:var(--am);font-weight:600">(older entry — not one of the two lockers)</span></td>'
+      + '<td class="r mn" style="font-weight:700;font-size:14px;color:var(--tx2)">' + fmtCreditorBDT(c.bdtAmount) + '</td>'
+      + '<td class="no-print"><button class="btn bdg bsm" onclick="removeCreditorRow(\'' + c.id + '\')">Remove</button></td>'
       + '</tr>';
   }).join('');
 
@@ -6376,6 +6837,38 @@ function renderHomeLockerHTML() {
     + '</div>';
 }
 
+// ── Locker running balances ──
+// Every log entry shows "Balance after". Editing or deleting an OLDER entry,
+// or adding one with an earlier date, used to leave the balances on all the
+// entries after it wrong (only the touched entry was changed, and it was
+// given today's total). This replays the whole history in date order from
+// the locker's current balance and returns every entry whose figure changed.
+function lockerEffect(l) { return l.txType === 'deposit' ? NUM(l.amount) : -NUM(l.amount); }
+function recomputeLockerBalances(item) {
+  var lockerType = String(item.name).trim().toLowerCase() === 'small locker' ? 'small' : 'big';
+  var entries = CREDITORS.lockerLog.map(function(l, i){ return { l: l, i: i }; }).filter(function(x){
+    return String(x.l.creditorItemId) === String(item.id) || (!x.l.creditorItemId && x.l.lockerType === lockerType);
+  });
+  entries.sort(function(a, b){ return String(a.l.date).localeCompare(String(b.l.date)) || (a.i - b.i); });
+  var running = NUM(item.amount) - entries.reduce(function(s, x){ return s + lockerEffect(x.l); }, 0);
+  var changed = [];
+  entries.forEach(function(x){
+    running += lockerEffect(x.l);
+    running = Math.round(running * 100) / 100;
+    if (Math.abs(NUM(x.l.balanceAfter) - running) > 0.004) { x.l.balanceAfter = running; changed.push(x.l); }
+  });
+  return changed;
+}
+// Saves several log entries in one request (falls back to one-by-one on an
+// older Code.gs that doesn't have the batch action yet)
+async function saveLockerEntries(list) {
+  var seen = {}, unique = [];
+  list.forEach(function(l){ if (l && !seen[l.id]) { seen[l.id] = 1; unique.push(l); } });
+  if (!unique.length) return;
+  try { await api('saveLockerLogBatch', { entries: unique }); }
+  catch (e) { for (var i = 0; i < unique.length; i++) await api('saveLockerLog', unique[i]); }
+}
+
 // ── Deposit / Withdraw modal ──
 var _lockerTxState = { itemId: null, lockerType: null, mode: 'deposit' };
 function openLockerTx(lockerType, itemId) {
@@ -6384,7 +6877,7 @@ function openLockerTx(lockerType, itemId) {
   document.getElementById('locker-tx-title').textContent = (lockerType === 'small' ? 'Small Locker' : 'Big Locker');
   document.getElementById('locker-tx-balance').textContent = 'Current balance: ' + getCreditorCurrency(item.currency).symbol + fmtAcct(item.amount);
   document.getElementById('locker-tx-amount').value = '';
-  document.getElementById('locker-tx-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('locker-tx-date').value = todayISO();
   setLockerTxMode('deposit');
   om('m-locker-tx');
 }
@@ -6415,13 +6908,15 @@ async function submitLockerTx() {
     balanceAfter: item.amount, creditorItemId: item.id
   };
   CREDITORS.lockerLog.push(logEntry);
+  // A back-dated entry changes the balances of the entries after it
+  var changedEntries = recomputeLockerBalances(item);
 
   cm('m-locker-tx');
   renderCreditorsPage();
   showSync('saving', 'Saving...');
   try {
     await api('saveCreditor', item);
-    await api('saveLockerLog', logEntry);
+    await saveLockerEntries([logEntry].concat(changedEntries));
     showSync('ok', 'Saved');
   } catch(e) { showSync('err', 'Save failed'); }
 }
@@ -6441,9 +6936,11 @@ function setLockerHistoryFilter(f) {
 }
 function renderLockerHistoryList() {
   var list = document.getElementById('locker-hist-list');
+  var order = {};
+  CREDITORS.lockerLog.forEach(function(l, i){ order[l.id] = i; });
   var entries = CREDITORS.lockerLog.filter(function(l){
     return _lockerHistoryFilter === 'combined' || l.lockerType === _lockerHistoryFilter;
-  }).slice().sort(function(a,b){ return String(b.date).localeCompare(String(a.date)); });
+  }).slice().sort(function(a,b){ return String(b.date).localeCompare(String(a.date)) || (order[b.id] - order[a.id]); });
 
   if (!entries.length) {
     list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:13px">No transactions logged yet</div>';
@@ -6501,7 +6998,7 @@ async function saveLockerLogEdit() {
   entry.txType = newType;
   entry.amount = newAmount;
   entry.date = newDate;
-  entry.balanceAfter = item.amount;
+  var changedEntries = recomputeLockerBalances(item); // fixes this entry AND every later one
 
   cm('m-locker-edit-log');
   renderLockerHistoryList();
@@ -6509,7 +7006,7 @@ async function saveLockerLogEdit() {
   showSync('saving', 'Saving...');
   try {
     await api('saveCreditor', item);
-    await api('editLockerLog', entry);
+    await saveLockerEntries([entry].concat(changedEntries));
     showSync('ok', 'Updated');
   } catch(e) { showSync('err', 'Save failed'); }
 }
@@ -6531,6 +7028,7 @@ async function deleteLockerLogRow(logId) {
     item.bdtAmount = NUM(item.amount) * creditorRate(item.currency);
   }
   CREDITORS.lockerLog = CREDITORS.lockerLog.filter(function(l){ return l.id !== logId; });
+  var changedEntries = item ? recomputeLockerBalances(item) : []; // later entries' balances shift
 
   renderLockerHistoryList();
   renderCreditorsPage();
@@ -6538,6 +7036,7 @@ async function deleteLockerLogRow(logId) {
   try {
     if (item) await api('saveCreditor', item);
     await api('deleteLockerLog', { id: logId });
+    await saveLockerEntries(changedEntries);
     showSync('ok', 'Deleted');
   } catch(e) { showSync('err', 'Save failed'); }
 }
@@ -6562,6 +7061,9 @@ async function loadLiabilityData() {
 }
 
 function renderLiabilityPage() {
+  // USD rows always shown at today's USD rate (same rate as Creditors)
+  var usdRate = creditorRate('USD');
+  if (usdRate) LIABILITY.items.forEach(function(l){ if (l.currency === 'USD') l.bdtAmount = NUM(l.usdAmount) * usdRate; });
   renderLiabilityGrandTotal();
   renderLiabilityTable();
 }
@@ -6680,7 +7182,7 @@ async function removeLiabilityRow(id) {
 
 // ── Print (single flat table, ink-friendly, matches the rest of the app) ──
 function printLiability() {
-  var today = new Date().toISOString().split('T')[0];
+  var today = todayISO();
   function FDP(d){ if(!d) return ''; var p = String(d).split('T')[0].split('-'); return p[2]+'/'+p[1]+'/'+p[0].slice(2); }
   var total = 0;
   var bodyHtml = LIABILITY.items.map(function(l, i) {
@@ -6711,14 +7213,14 @@ function printLiability() {
   html += '@page{size:A4 portrait;margin:16mm 15mm 18mm 15mm}';
   html += '@media print{body{padding:0}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid}tr.total{page-break-before:avoid;break-before:avoid}}';
   html += '</style></head><body>';
-  html += '<div class="hdr"><div class="company">XYX FASHION</div>';
+  html += '<div class="hdr"><div class="company">' + esc(GROUP_PRINT_NAME) + '</div>';
   html += '<div class="title">Various Liability</div>';
   html += '<div class="meta">As of ' + FDP(today) + '</div></div>';
   html += '<table><thead><tr><th style="width:8%">#</th><th style="width:38%">Name</th><th style="width:12%">Currency</th><th class="r" style="width:20%">USD</th><th class="r" style="width:22%">BDT</th></tr></thead>';
   html += '<tbody>' + bodyHtml + '</tbody>';
   html += '<tfoot><tr class="total"><td class="r" colspan="4">Total (BDT)</td><td class="r">' + fmtCreditorBDT(total) + '</td></tr></tfoot>';
   html += '</table>';
-  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>XYX FASHION \u2014 Various Liability</span></div>';
+  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>' + esc(GROUP_PRINT_NAME) + ' \u2014 Various Liability</span></div>';
   html += '</body></html>';
 
   var win = window.open('', '_blank');
@@ -6733,8 +7235,11 @@ function printLiability() {
 // replacing the raw window.print() of the live card grid (which produced
 // no table borders and broke apart badly across pages). ──
 function printDashboardSummary(mode) {
-  var today = new Date().toISOString().split('T')[0];
+  var today = todayISO();
   function FDP(d){ if(!d) return ''; var p = String(d).split('T')[0].split('-'); return p[2]+'/'+p[1]+'/'+p[0].slice(2); }
+  // Accounting style: a negative balance (party paid in advance) prints in
+  // brackets. F() alone drops the sign, so it printed like money owed.
+  function FS(n){ return n < -0.5 ? '(' + F(n) + ')' : F(n); }
 
   var headHtml, bodyHtml, footHtml, titleText;
 
@@ -6753,11 +7258,11 @@ function printDashboardSummary(mode) {
     var grandReceivable = 0;
     bodyHtml = order.map(function(name, i){
       grandReceivable += byName[name];
-      return '<tr><td class="c">' + (i+1) + '</td><td class="l b">' + (name||'\u2014') + '</td><td class="r b">' + F(byName[name]) + '</td></tr>';
+      return '<tr><td class="c">' + (i+1) + '</td><td class="l b">' + esc(name||'\u2014') + '</td><td class="r b">' + FS(byName[name]) + '</td></tr>';
     }).join('');
     if (!order.length) bodyHtml = '<tr><td colspan="3" class="c" style="color:#86868b;padding:16px">No parties yet</td></tr>';
     headHtml = '<tr><th style="width:10%">#</th><th style="width:55%">Party Name</th><th class="r" style="width:35%">Receivable</th></tr>';
-    footHtml = '<tr class="total"><td colspan="2" class="r">Grand Total</td><td class="r">' + F(grandReceivable) + '</td></tr>';
+    footHtml = '<tr class="total"><td colspan="2" class="r">Grand Total</td><td class="r">' + FS(grandReceivable) + '</td></tr>';
   } else {
     // Option 1 — full detail, one row per party ledger record
     titleText = 'Cash LC \u2014 Party Summary';
@@ -6770,17 +7275,17 @@ function printDashboardSummary(mode) {
       grandBalance += c.bal;
       var typeLabel = p.ptype === 'fabric' ? 'Fabric' : 'Accessories';
       return '<tr><td class="c">' + (i+1) + '</td>'
-        + '<td class="l b">' + (p.name||'\u2014') + '</td>'
+        + '<td class="l b">' + esc(p.name||'\u2014') + '</td>'
         + '<td class="c">' + typeLabel + '</td>'
         + '<td class="r">' + F(c.tdFull) + '</td>'
         + '<td class="r">' + F(c.tc) + '</td>'
-        + '<td class="r b">' + F(c.bal) + '</td></tr>';
+        + '<td class="r b">' + FS(c.bal) + '</td></tr>';
     }).join('');
     if (!rows.length) bodyHtml = '<tr><td colspan="6" class="c" style="color:#86868b;padding:16px">No parties yet</td></tr>';
     headHtml = '<tr><th style="width:6%">#</th><th style="width:30%">Party Name</th><th style="width:14%">Type</th>'
       + '<th class="r" style="width:16%">Total Debit</th><th class="r" style="width:16%">Total Credit</th><th class="r" style="width:18%">Balance</th></tr>';
     footHtml = '<tr class="total"><td colspan="3" class="r">Grand Total</td>'
-      + '<td class="r">' + F(grandDebit) + '</td><td class="r">' + F(grandCredit) + '</td><td class="r">' + F(grandBalance) + '</td></tr>';
+      + '<td class="r">' + F(grandDebit) + '</td><td class="r">' + F(grandCredit) + '</td><td class="r">' + FS(grandBalance) + '</td></tr>';
   }
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Cash LC Summary</title>';
@@ -6802,14 +7307,14 @@ function printDashboardSummary(mode) {
   html += '@page{size:A4 portrait;margin:16mm 15mm 18mm 15mm}';
   html += '@media print{body{padding:0}thead{display:table-header-group}tr{page-break-inside:avoid;break-inside:avoid}tr.total{page-break-before:avoid;break-before:avoid}}';
   html += '</style></head><body>';
-  html += '<div class="hdr"><div class="company">XYX FASHION</div>';
+  html += '<div class="hdr"><div class="company">' + esc(PRINT_COMPANY_NAME) + '</div>';
   html += '<div class="title">' + titleText + '</div>';
-  html += '<div class="meta">As of ' + FDP(today) + '</div></div>';
+  html += '<div class="meta">As of ' + FDP(today) + ' &middot; amounts in brackets are advances (party in credit)</div></div>';
   html += '<table><thead>' + headHtml + '</thead>';
   html += '<tbody>' + bodyHtml + '</tbody>';
   html += '<tfoot>' + footHtml + '</tfoot>';
   html += '</table>';
-  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>XYX FASHION \u2014 Cash LC Summary</span></div>';
+  html += '<div class="ft"><span>Generated: ' + FDP(today) + '</span><span>' + esc(PRINT_COMPANY_NAME) + ' \u2014 Cash LC Summary</span></div>';
   html += '</body></html>';
 
   var win = window.open('', '_blank');
@@ -6833,40 +7338,128 @@ try {
     if (_sbt) { _sbt.innerHTML = '&#9776;'; _sbt.title = 'Show sidebar'; }
   }
 } catch(e) {}
-document.addEventListener('keydown',function(e){ if((e.ctrlKey||e.metaKey)&&e.key==='k'&&!document.getElementById('login-screen').classList.contains('hidden')){ e.preventDefault(); openLCSearch(); } });
+// Ctrl/Cmd+K opens LC search — only once you're signed in. (The check was
+// reversed: it only fired while the LOGIN screen was showing.)
+document.addEventListener('keydown',function(e){ if((e.ctrlKey||e.metaKey)&&(e.key==='k'||e.key==='K')&&document.getElementById('login-screen').classList.contains('hidden')){ e.preventDefault(); openLCSearch(); } });
 
-// ── Frozen table headers, applied automatically to every table everywhere ──
-// Any element with the standard .tw table-wrapper class gets a sticky header
-// with a smooth shadow transition once scrolled — this covers every table
-// across Cash LC, Banking, and Loans today, and automatically picks up any
-// table added by a future module too, since it watches the DOM directly
-// rather than requiring each render function to opt in individually.
-var _stickyHeadersInit = new WeakSet();
-function wireStickyHeader(el) {
-  if (_stickyHeadersInit.has(el)) return; // already wired, avoid duplicate listeners
-  _stickyHeadersInit.add(el);
-  el.addEventListener('scroll', function(){
-    el.classList.toggle('tw-scrolled', el.scrollTop > 4);
-  });
-}
-function setupStickyHeaders(root) {
-  (root || document).querySelectorAll('.tw').forEach(wireStickyHeader);
-}
-setupStickyHeaders(); // catch whatever's already in the DOM at load time
-var _stickyObserver = new MutationObserver(function(mutations){
-  mutations.forEach(function(m){
-    m.addedNodes.forEach(function(node){
-      if (node.nodeType !== 1) return; // element nodes only
-      if (node.classList && node.classList.contains('tw')) wireStickyHeader(node);
-      if (node.querySelectorAll) node.querySelectorAll('.tw').forEach(wireStickyHeader);
+// ═══ SECTION: FLOATING TABLE HEADER + FLOATING SCROLLBAR ═══
+// Works for every table in a .tw wrapper, on every page, with no changes
+// needed in the individual render functions:
+//  • Floating header — once a table's header row scrolls off the top of the
+//    window (and the table is still on screen), a copy of that header row is
+//    pinned to the top of the window, with each column exactly as wide as
+//    the real one and moving sideways with the table.
+//  • Floating scrollbar — when a table is wider than its card, and the card's
+//    own scrollbar (at the very bottom of the table) is below the window, a
+//    scrollbar is pinned to the bottom of the window. Dragging either one
+//    moves the other.
+var FLOAT = (function(){
+  var head = document.createElement('div'); head.id = 'float-head';
+  var bar  = document.createElement('div'); bar.id  = 'float-scroll';
+  var barInner = document.createElement('div'); bar.appendChild(barInner);
+  document.body.appendChild(head); document.body.appendChild(bar);
+
+  var headTw = null, headSig = '', headTable = null;
+  var barTw = null, syncing = false, queued = false;
+
+  function tables() {
+    return Array.prototype.slice.call(document.querySelectorAll('.page.active .tw')).filter(function(tw){
+      return tw.offsetParent !== null && tw.querySelector('thead');
     });
+  }
+
+  function buildHead(tw, thead) {
+    var t = document.createElement('table');
+    var clone = thead.cloneNode(true);
+    clone.querySelectorAll('[id]').forEach(function(el){ el.removeAttribute('id'); }); // no duplicate ids
+    clone.removeAttribute('id');
+    t.appendChild(clone);
+    head.innerHTML = '';
+    head.appendChild(t);
+    headTable = t;
+  }
+
+  function placeHead(list) {
+    var target = null, thead = null, r = null, hr = null;
+    for (var i = 0; i < list.length; i++) {
+      var th = list[i].querySelector('thead');
+      var rr = list[i].getBoundingClientRect();
+      var hh = th.getBoundingClientRect();
+      // header scrolled above the top, but some body rows still visible
+      if (hh.top < 0 && rr.bottom > hh.height + 24) { target = list[i]; thead = th; r = rr; hr = hh; break; }
+    }
+    if (!target) { head.style.display = 'none'; headTw = null; return; }
+    var sig = thead.innerHTML;
+    if (target !== headTw || sig !== headSig || !headTable) { buildHead(target, thead); headTw = target; headSig = sig; }
+    // copy the real column widths so every floating header cell sits exactly over its column
+    var realThs = thead.querySelectorAll('th'), copyThs = headTable.querySelectorAll('th');
+    for (var j = 0; j < realThs.length && j < copyThs.length; j++) {
+      var w = realThs[j].getBoundingClientRect().width + 'px';
+      copyThs[j].style.width = w; copyThs[j].style.minWidth = w; copyThs[j].style.maxWidth = w;
+    }
+    var realTable = target.querySelector('table');
+    headTable.style.width = realTable.getBoundingClientRect().width + 'px';
+    headTable.style.transform = 'translateX(' + (-target.scrollLeft) + 'px)';
+    head.style.left  = r.left + 'px';
+    head.style.width = target.clientWidth + 'px';
+    head.style.display = 'block';
+    // slide away smoothly as the bottom of the table reaches the top of the window
+    var h = head.offsetHeight;
+    head.style.top = Math.min(0, r.bottom - h - 24) + 'px';
+  }
+
+  function placeBar(list) {
+    var vh = window.innerHeight, target = null, r = null;
+    for (var i = 0; i < list.length; i++) {
+      var tw = list[i];
+      if (tw.scrollWidth <= tw.clientWidth + 1) continue; // fits — nothing to scroll
+      var rr = tw.getBoundingClientRect();
+      // table on screen, but its own scrollbar is below the bottom of the window
+      if (rr.top < vh - 60 && rr.bottom > vh) { target = tw; r = rr; break; }
+    }
+    if (!target) { bar.style.display = 'none'; barTw = null; return; }
+    barTw = target;
+    bar.style.left  = r.left + 'px';
+    bar.style.width = target.clientWidth + 'px';
+    barInner.style.width = target.scrollWidth + 'px';
+    bar.style.display = 'block';
+    if (Math.abs(bar.scrollLeft - target.scrollLeft) > 1) { syncing = true; bar.scrollLeft = target.scrollLeft; }
+  }
+
+  function update() {
+    queued = false;
+    var list = tables();
+    placeHead(list);
+    placeBar(list);
+  }
+  function schedule() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+
+  // Page scroll, and sideways scrolling of any table (scroll events don't
+  // bubble, so listen in the capture phase to hear every table)
+  document.addEventListener('scroll', function(e){
+    var t = e.target;
+    if (t && t.classList && t.classList.contains('tw')) {
+      if (t === barTw && !syncing && Math.abs(bar.scrollLeft - t.scrollLeft) > 1) { syncing = true; bar.scrollLeft = t.scrollLeft; }
+      else syncing = false;
+      if (t === headTw && headTable) headTable.style.transform = 'translateX(' + (-t.scrollLeft) + 'px)';
+      return;
+    }
+    schedule();
+  }, true);
+  bar.addEventListener('scroll', function(){
+    if (syncing) { syncing = false; return; }
+    if (barTw) barTw.scrollLeft = bar.scrollLeft;
   });
-});
-var _appRoot = document.getElementById('app');
-if (_appRoot) _stickyObserver.observe(_appRoot, { childList: true, subtree: true });
+  window.addEventListener('resize', schedule);
+  // Tables re-render when data changes or you switch page — re-check a few
+  // times a second (cheap: only reads positions of the visible tables)
+  setInterval(schedule, 400);
+  return { update: schedule };
+})();
 
 // ── INIT ──
 applyTheme();
+updateConnStatus(); // show the offline banner straight away if the page opens offline
 if(checkSession()){
   document.getElementById('login-screen').classList.add('hidden');
   // Banking is already active by default (from HTML), start loading
@@ -7189,6 +7782,31 @@ if(checkSession()){
     <div class="mft">
       <button class="btn bg" onclick="cm('m-locker-edit-log')">Cancel</button>
       <button class="btn bp" onclick="saveLockerLogEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- BANKING: PRINT OPTIONS -->
+<div class="modal-overlay" id="m-bank-print">
+  <div class="modal" style="width:480px">
+    <div class="mh"><h2>Print Banking</h2><button class="mcl" onclick="cm('m-bank-print')">&#x2715;</button></div>
+    <div class="mb">
+      <div class="mfg"><label>Company</label>
+        <select id="bpr-company"></select>
+        <div id="bpr-nocompany" style="display:none;font-size:11px;color:var(--am);margin-top:4px"></div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:var(--tx)"><input type="checkbox" id="bpr-opened" checked> Opened LCs</label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:var(--tx)"><input type="checkbox" id="bpr-accepted" checked> Accepted Bills (by maturity month)</label>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:12px 14px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:var(--tx)"><input type="checkbox" id="bpr-party"> Show the Cash LC party column</label>
+        <div style="font-size:11px;color:var(--tx3);margin-top:4px">Off by default, so Cash LC party names don't appear on a document carrying the company name.</div>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn bg" onclick="cm('m-bank-print')">Cancel</button>
+      <button class="btn bp" onclick="printBanking()"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:2px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Print</button>
     </div>
   </div>
 </div>
