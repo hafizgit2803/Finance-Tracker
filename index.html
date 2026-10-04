@@ -842,6 +842,8 @@ catch (e) { document.body.classList.add('light'); }
       <div class="cg" id="p-kpis"></div>
       <div class="acc-panel">
         <div class="arow">
+          <div class="aitem"><div class="al">Previous Balance</div><div class="av" id="acpv">—</div></div>
+          <div class="adivider"></div>
           <div class="aitem"><div class="al">Acceptance Given</div><div class="av g" id="acg">—</div></div>
           <div class="adivider"></div>
           <div class="aitem"><div class="al">Not Given</div><div class="av a" id="acng">—</div></div>
@@ -1470,7 +1472,12 @@ function calc(p) {
   const bal = pv+td-tc;
   const ag  = myDebits.filter(r=>r.accept==='yes').reduce((s,r)=>s+NUM(r.bdt)+NUM(r.commission),0);
   const ang = myDebits.filter(r=>r.accept!=='yes').reduce((s,r)=>s+NUM(r.bdt)+NUM(r.commission),0);
-  const due = ag-tc;
+  // The previous balance is debt the party has already acknowledged, and it
+  // is the first thing their payments clear (same order as the FIFO
+  // coverage below) — so it counts on the ACCEPTED side. It used to be left
+  // out, which understated what's due by exactly the previous balance and
+  // could show "Surplus / OK" while the party still owed money.
+  const due = pv+ag-tc;
   const tdFull = td + pv;
   // FIFO party-payment coverage: previous balance covered first, then LCs oldest-first
   let pool = Math.max(0, tc - pv);
@@ -1724,18 +1731,20 @@ function renderPartyPage(){
     <div class="kc"><div class="kl">Receivable</div><div class="kv ${c.bal>0?'r':'g'}">${F(c.bal)}</div><div class="ks">${c.bal>0?'Outstanding':'All cleared'}</div></div>
     <div class="kc"><div class="kl">Total Debit</div><div class="kv r">${F(c.tdFull)}</div><div class="ks">${c.myDebits.length} LCs${c.pv ? ' + prev bal ' + F(c.pv) : ''}</div></div>
     <div class="kc"><div class="kl">Total Credit</div><div class="kv g">${F(c.tc)}</div><div class="ks">${c.myCredits.length} payments</div></div>
-    <div class="kc"><div class="kl">Acceptance Due</div><div class="kv ${c.due>0?'r':'g'}">${c.due>0?'+':''}${F(c.due)}</div><div class="ks">${c.due>0?'Party owes you':'Surplus'}</div></div>
+    <div class="kc"><div class="kl">${c.due>0?'Acceptance Due':c.due<0?'Acceptance Surplus':'Acceptance Due'}</div><div class="kv ${c.due>0?'r':'g'}">${F(c.due)}</div><div class="ks">${c.due>0?'Party owes you':c.due<0?'Paid ahead of acceptance':'Fully covered'}</div></div>
     ${p.ptype==='fabric'?'<div class="kc"><div class="kl">Packages Delivered</div><div class="kv b">'+c.pkgDlv+' / '+c.pkgTot+'</div><div class="ks">'+(c.pkgTot>0?Math.round(c.pkgDlv/c.pkgTot*100):0)+'% complete</div></div><div class="kc"><div class="kl">Cleared LCs</div><div class="kv g">'+c.cleared+' / '+c.myDebits.length+'</div><div class="ks">Fully party-paid</div></div>':''}`;
+  document.getElementById('acpv').textContent=(c.pv<0?'Advance ':'')+F(c.pv);
   document.getElementById('acg').textContent=F(c.ag);
   document.getElementById('acng').textContent=F(c.ang);
   document.getElementById('acrc').textContent=F(c.tc);
   document.getElementById('acst').innerHTML=`<span class="badge ${c.ok?'ok':'warn'}">${c.ok?'OK':'NOT OK'}</span>`;
   const dv=document.getElementById('acdv');
-  dv.textContent=(c.due>0?'+':c.due<0?'-':'')+F(Math.abs(c.due));
+  dv.textContent=F(c.due); // always shown as a plain amount — the label says whether it's owed or surplus
   dv.className='due-val '+(c.due>0?'r':c.due<0?'g':'');
   document.getElementById('due-label').textContent=c.due>0
-    ?'Amount still owed against accepted LCs (Acceptance Given − Credit):' 
-    :'Surplus — credit exceeds acceptance given:';
+    ?'Still owed (Previous Balance + Acceptance Given − Credit):'
+    :c.due<0?'Surplus — credit exceeds Previous Balance + Acceptance Given:'
+    :'Previous balance and accepted LCs fully covered:';
   const cos=[...new Set(c.myDebits.map(r=>r.company).filter(Boolean))].sort();
   const sel=document.getElementById('fc'),cv=sel.value;
   sel.innerHTML='<option value="">All</option>'+cos.map(co=>`<option value="${co}" ${co===cv?'selected':''}>${co}</option>`).join('');
@@ -3022,8 +3031,8 @@ function copyWA() {
     `*Total Payments Received:* ${F(c.tc)}`,
     ``,
     `*Acceptance Given:* ${F(c.ag)}`,
-    `*Acceptance Due:* ${c.due>0?'+':''}${F(c.due)}`,
-    `*Status:* ${c.ok?'✅ OK — Credit ≥ Acceptance':'⚠️ NOT OK — Payment required'}`,
+    c.due>0 ? `*Acceptance Due (incl. previous balance):* ${F(c.due)}` : `*Acceptance Surplus:* ${F(c.due)}`,
+    `*Status:* ${c.ok?'✅ OK — Credit covers previous balance + acceptance':'⚠️ NOT OK — Payment required'}`,
   ];
   navigator.clipboard.writeText(lines.join('\n')).then(()=>{
     const t=document.getElementById('copy-toast');
@@ -3144,24 +3153,25 @@ function doPrint(){
   html+='.hdr .meta{font-size:10px;color:#6e6e73;margin-top:6px}';
   html+='.hdr .partyname{font-size:17px;font-weight:700;color:#1d1d1f;margin-top:10px}';
   html+='table{width:100%;border-collapse:collapse;margin-top:4px}';
-  html+='thead th{background:#FBF4EF;color:#6e6e73;padding:7px 6px;font-size:8.8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;border-bottom:1.5px solid #1d1d1f;text-align:center}';
-  html+='tbody td{border-bottom:1px solid #ececea;padding:6px 6px;font-size:9.8px;vertical-align:top}';
+  html+='thead th{background:#FBF4EF;color:#6e6e73;padding:8px 10px;font-size:8.8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;border-bottom:1.5px solid #1d1d1f;text-align:center}';
+  html+='tbody td{border-bottom:1px solid #ececea;padding:7px 10px;font-size:9.8px;vertical-align:top}';
   html+='td.l{text-align:left}td.c{text-align:center;white-space:nowrap}td.usd{text-align:center;font-size:8.6px;color:#6e6e73}td.r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}td.b{font-weight:600}';
   html+='.note{font-size:8px;color:#86868b;margin-top:2px}';
   html+='.ledgertag{display:inline-block;font-size:7.5px;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:5px;letter-spacing:.3px;vertical-align:middle}';
   html+='.ledgertag.acc{background:#E8F3EC;color:#1f7a4d}';
   html+='.ledgertag.fab{background:#EAF1FB;color:#2659a8}';
   html+='tr.opening td{background:#FBF4EF;font-weight:600}';
+  html+='th:first-child,td:first-child{padding-left:14px}th:last-child,td:last-child{padding-right:14px}';
   html+='tr:nth-child(even) td{background:#FCFBFA}';
   html+='tr.total td{background:#fff;font-weight:700;border-top:1.5px solid #1d1d1f;border-bottom:none;font-size:10.5px}';
   html+='tr.grand td{background:#FBF4EF;color:#1d1d1f;font-weight:700;font-size:11px;border-top:2px solid #CC785C;border-bottom:2px solid #CC785C}';
   html+='.summary{margin-top:16px;display:flex;border:1px solid #E8DFD5;border-radius:6px;overflow:hidden}';
-  html+='.sc{flex:1;padding:9px 10px;border-right:1px solid #E8DFD5}.sc:last-child{border-right:none}';
+  html+='.sc{flex:1;padding:10px 14px;border-right:1px solid #E8DFD5}.sc:last-child{border-right:none}';
   html+='.scl{font-size:7.8px;color:#86868b;text-transform:uppercase;letter-spacing:.4px}.scv{font-size:12.5px;font-weight:700;margin-top:3px;color:#1d1d1f}';
   html+='.ft{margin-top:14px;padding-top:8px;border-top:1px solid #E8DFD5;font-size:8px;color:#86868b;display:flex;justify-content:space-between}';
   html+='@page{size:A4 portrait;margin:16mm 15mm 28mm 15mm}';
   html+='@media print{';
-  html+='body{padding:0}';
+  html+='body{padding:0 4mm}';
   html+='table{page-break-inside:auto}';
   html+='thead{display:table-header-group}';
   html+='tr{page-break-inside:avoid;break-inside:avoid}';
