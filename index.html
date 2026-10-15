@@ -549,6 +549,37 @@ details.conv summary{cursor:pointer;font-size:12px;color:var(--tx2);margin-top:4
 #bsub-opened .prog-t{font-size:10.5px}
 #bsub-opened .prog{min-width:88px}
 #bsub-opened td.cmp .chip{font-size:10px;padding:2px 6px}
+
+/* ── Roles: what each person sees (the server enforces the same rules) ── */
+.login-box select{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--bdr2);background:var(--bg3);color:var(--tx);font-size:14px;margin-bottom:10px;font-family:inherit}
+.sb-me{border:1px solid var(--bdr2);border-radius:var(--r);padding:9px 10px;margin-bottom:8px;font-size:12px}
+.sb-me b{display:block;font-size:12.5px;color:var(--tx)}
+.sb-me small{color:var(--tx3)}
+.sb-me .links{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:6px}
+.sb-me .links a{color:var(--tx2);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.sb-me .links a:hover{color:var(--tx)}
+body:not(.role-admin) .only-admin{display:none!important}
+/* Commercial: Banking > Opened LCs only */
+body.role-commercial #nav-cashlc, body.role-commercial #nav-loans, body.role-commercial #nav-fdr,
+body.role-commercial #nav-creditors, body.role-commercial #nav-liability,
+body.role-commercial #nav-bsub-atbank, body.role-commercial #nav-bsub-accepted, body.role-commercial #nav-bsub-history,
+body.role-commercial .sb-backup, body.role-commercial .bstrip,
+body.role-commercial #page-banking .ph .btn:not(.bp):not([onclick^="refreshBankData"]),
+body.role-commercial #page-banking .ph input, body.role-commercial #bank-search-dd,
+body.role-commercial .col-docs, body.role-commercial .col-wait, body.role-commercial .col-party,
+body.role-commercial #bsub-opened tfoot, body.role-commercial #bsub-opened .sw-tot,
+body.role-commercial #session-bar button:not([onclick^="doLogout"]),
+body.role-commercial #blc-cash-label, body.role-commercial #blc-cash-section { display:none!important }
+/* Managing Director: Cash LC is view-only */
+body.role-md #blc-cash-label, body.role-md #blc-cash-section,
+body.role-md .bs-pen,
+body.role-md #page-party [onclick^="openAddLC"], body.role-md #page-party [onclick^="openEditLC"], body.role-md #page-party [onclick^="delLC"],
+body.role-md #page-party [onclick^="openEditParty"], body.role-md #page-dashboard [onclick^="openAddParty"],
+body.role-md #page-party [onclick^="openEditCr"], body.role-md #page-party [onclick^="dCr"],
+body.role-md #page-party .fbar:has(#crd),
+body.role-md #bk-list .bdg, body.role-md #bk-undo { display:none!important }
+body.role-md #page-party [onclick^="oDLV"]{pointer-events:none;cursor:default}
+body:not(.role-admin) #dtb .pill{cursor:default}
 </style>
 </head>
 <body>
@@ -563,8 +594,9 @@ catch (e) { document.body.classList.add('light'); }
 <div id="login-screen">
   <div class="login-box">
     <div class="logo">Finance</div>
-    <div class="sub">Enter your password to continue</div>
-    <input type="password" id="pw-input" placeholder="••••••••">
+    <div class="sub">Choose your name and enter your password</div>
+    <select id="login-user" aria-label="Name"><option value="">Loading&hellip;</option></select>
+    <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
     <div class="err" id="pw-err"></div>
     <button onclick="doLogin()">Sign In</button>
   </div>
@@ -637,6 +669,8 @@ catch (e) { document.body.classList.add('light'); }
       </div>
     </nav>
     <div class="sb-ft">
+      <div class="sb-me"><b id="me-name"></b><small id="me-role"></small>
+        <div class="links"><a onclick="openChangePassword()">Change password</a><a class="only-admin" onclick="openUsers()">Users</a><a onclick="doLogout()">Log out</a></div></div>
       <button class="sb-backup" onclick="openBackup()" title="Backups in Google Drive"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Backup<small id="sb-backup-time">&mdash;</small></span></button>
     </div>
   </aside>
@@ -732,8 +766,8 @@ catch (e) { document.body.classList.add('light'); }
           <div class="tw"><table>
             <thead><tr>
               <th>#</th><th>Date</th><th>LC No.</th><th>Supplier</th><th>Type</th><th>Buyer</th><th>Expiry</th>
-              <th class="r">LC&nbsp;value</th><th>Docs received</th><th class="r">Waiting</th>
-              <th>Party</th><th class="no-print">Actions</th>
+              <th class="r">LC&nbsp;value</th><th class="col-docs">Docs received</th><th class="r col-wait">Waiting</th>
+              <th class="col-party">Party</th><th class="no-print">Actions</th>
             </tr></thead>
             <tbody id="op-tbody"></tbody>
             <tfoot><tr>
@@ -831,7 +865,7 @@ catch (e) { document.body.classList.add('light'); }
           <li>You can undo it later from <b>Backup &rarr; Undo the LC upgrade</b> (PIN).</li>
         </ul>
         <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn bp" id="conv-run" onclick="runConversionCheck()">Run the check</button>
+          <button class="btn bp only-admin" id="conv-run" onclick="runConversionCheck()">Run the check</button>
         </div>
       </div>
       <div id="conv-report"></div>
@@ -1391,61 +1425,164 @@ catch (e) { document.body.classList.add('light'); }
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxZpOKCs8BdCLdo-CeEp7lNpnKA4XiUTtaNRUUljvUMuxyXsTpuOMMzZ4P1mZbgIT4m/exec';
 
 // ═══ SECTION: AUTH & SESSION (login, logout, timer) ═══
-const SK_SESSION = 'lc_session';
-const SESSION_MS = 60 * 60 * 1000;
-const PW_HASH = '2048a1a0ff1eb2e07471a99cfb718b5d3dcc97f44aa049a612ea6b6e5408697b';
+// ═══ SECTION: LOGIN, SESSION, ROLES ═══
+// The server checks every request; this part only decides what to show.
+var AUTH = { token: '', user: null, exp: 0 };
+var SK_AUTH = 'fin_auth';
+var SESSION_MS = 60 * 60 * 1000;            // you are logged out after 1 hour, as before
 let sessionTimer = null, sessionEnd = null;
+function ROLE() { return AUTH.user ? AUTH.user.role : ''; }
+function isAdmin() { return ROLE() === 'admin'; }
+function isMD() { return ROLE() === 'md'; }
+function isCom() { return ROLE() === 'commercial'; }
+function canEditCash() { return isAdmin(); }
 
-async function hashPW(pw) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+function saveAuth() { try { sessionStorage.setItem(SK_AUTH, JSON.stringify(AUTH)); } catch (e) {} }
+function loadAuth() {
+  try { var a = JSON.parse(sessionStorage.getItem(SK_AUTH) || 'null'); if (a && a.token && a.exp > Date.now()) { AUTH = a; return true; } } catch (e) {}
+  return false;
 }
-async function doLogin() {
-  const h = await hashPW(document.getElementById('pw-input').value);
-  if (h === PW_HASH) {
-    const exp = Date.now() + SESSION_MS;
-    sessionStorage.setItem(SK_SESSION, exp);
-    document.getElementById('login-screen').classList.add('hidden');
-    // Show banking page immediately — data will populate when loaded
-    document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
-    document.querySelectorAll('.ni').forEach(function(n){ n.classList.remove('active'); });
-    document.getElementById('page-banking').classList.add('active');
-    var _nb = document.getElementById('nav-banking');
-    if (_nb) _nb.classList.add('active');
-    startTimer(exp); await initApp();
-  } else {
-    document.getElementById('pw-err').textContent = 'Incorrect password.';
-    document.getElementById('pw-input').value = '';
-    setTimeout(()=>document.getElementById('pw-err').textContent='', 2500);
+function clearFinCaches() {
+  try { Object.keys(localStorage).forEach(function(k){ if (k.indexOf('fin_cache_') === 0 || k === 'lc_cache_v2') localStorage.removeItem(k); }); } catch (e) {}
+}
+function cacheKey() { return 'fin_cache_v2_' + (AUTH.user ? AUTH.user.id : 'none'); }
+
+async function loadLoginUsers() {
+  var sel = document.getElementById('login-user');
+  try {
+    var r = await api('loginUsers');
+    var last = ''; try { last = localStorage.getItem('fin_last_user') || ''; } catch (e) {}
+    sel.innerHTML = r.users.map(function(u){ return '<option value="' + esc(u.id) + '"' + (u.id === last ? ' selected' : '') + '>' + esc(u.name) + '</option>'; }).join('');
+  } catch (e) {
+    sel.innerHTML = '<option value="">Cannot reach the server</option>';
+    document.getElementById('pw-err').textContent = e.message;
   }
 }
-function doLogout() {
-  cashLCUnlocked = false;
-  BANK._loaded = false;
-  // Clear cache on logout so next login reflects any changes made elsewhere
-  try { localStorage.removeItem(CACHE_KEY); } catch(e){}
-  sessionStorage.removeItem(SK_SESSION); clearInterval(sessionTimer);
-  document.getElementById('login-screen').classList.remove('hidden');
-  document.getElementById('session-bar').style.display = 'none';
+async function doLogin() {
+  var uid = document.getElementById('login-user').value, pw = document.getElementById('pw-input').value;
+  var err = document.getElementById('pw-err');
+  if (!uid) { await loadLoginUsers(); return; }
+  if (!pw) { err.textContent = 'Enter your password.'; return; }
+  err.textContent = 'Signing in\u2026';
+  var r;
+  try { r = await api('login', { userId: uid, password: pw }); }
+  catch (e) {
+    err.textContent = e.message;
+    document.getElementById('pw-input').value = '';
+    return;
+  }
+  err.textContent = '';
+  try { localStorage.setItem('fin_last_user', uid); } catch (e) {}
+  AUTH = { token: r.token, user: r.user, exp: Math.min(r.exp, Date.now() + SESSION_MS) };
+  saveAuth();
   document.getElementById('pw-input').value = '';
+  document.getElementById('login-screen').classList.add('hidden');
+  applyRole();
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.ni').forEach(function(n){ n.classList.remove('active'); });
+  document.getElementById('page-banking').classList.add('active');
+  var _nb = document.getElementById('nav-banking'); if (_nb) _nb.classList.add('active');
+  if (isCom()) setBankSub('opened');
+  startTimer(AUTH.exp); await initApp();
 }
+function doLogout(message) {
+  var tok = AUTH.token;
+  if (tok) { try { fetch(SHEET_URL, { method: 'POST', body: JSON.stringify({ action: 'logout', token: tok }), headers: { 'Content-Type': 'text/plain' } }).catch(function(){}); } catch (e) {} }
+  // Nothing of this person's data stays in the browser for the next person
+  try { sessionStorage.removeItem(SK_AUTH); } catch (e) {}
+  location.hash = '';
+  try { sessionStorage.setItem('fin_logout_msg', message || ''); } catch (e) {}
+  clearFinCaches();
+  location.reload();
+}
+function sessionEnded() { doLogout('Your session ended. Please log in again.'); }
 function startTimer(exp) {
   sessionEnd = exp; clearInterval(sessionTimer);
   sessionTimer = setInterval(() => {
     const left = sessionEnd - Date.now();
-    if (left <= 0) { doLogout(); return; }
+    if (left <= 0) { doLogout('You were logged out after 1 hour.'); return; }
     const bar = document.getElementById('session-bar');
     if (left <= 5 * 60 * 1000) {
-      const m=Math.floor(left/60000), s=Math.floor((left%60000)/1000);
-      document.getElementById('timer-display').textContent=`${m}:${String(s).padStart(2,'0')}`;
-      document.getElementById('timer-display').style.color=left<=60000?'var(--rd)':'var(--am)';
-      bar.style.display='flex';
-    } else { bar.style.display='none'; }
+      const m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+      document.getElementById('timer-display').textContent = `${m}:${String(s).padStart(2, '0')}`;
+      document.getElementById('timer-display').style.color = left <= 60000 ? 'var(--rd)' : 'var(--am)';
+      bar.style.display = 'flex';
+    } else { bar.style.display = 'none'; }
   }, 1000);
 }
-function checkSession() {
-  const exp = sessionStorage.getItem(SK_SESSION);
-  return exp && Date.now() < parseInt(exp);
+function checkSession() { return loadAuth(); }
+
+function applyRole() {
+  var b = document.body;
+  ['role-admin', 'role-md', 'role-commercial'].forEach(function(c){ b.classList.remove(c); });
+  if (!AUTH.user) return;
+  b.classList.add('role-' + AUTH.user.role);
+  document.getElementById('me-name').textContent = AUTH.user.name;
+  document.getElementById('me-role').textContent = AUTH.user.roleName || AUTH.user.role;
+  var cashLabel = document.getElementById('blc-cash-label');
+  if (cashLabel) cashLabel.innerHTML = '<input type="checkbox" id="blc-is-cash" onchange="toggleBLCCash()"> Add the <strong>Cash LC</strong> part (party ledger)';
+}
+
+// ── Change own password ──
+function openChangePassword() {
+  ['cp-old', 'cp-new', 'cp-new2'].forEach(function(id){ document.getElementById(id).value = ''; });
+  om('m-chpw');
+  setTimeout(function(){ document.getElementById('cp-old').focus(); }, 120);
+}
+async function svChangePassword() {
+  var o = document.getElementById('cp-old').value, n1 = document.getElementById('cp-new').value, n2 = document.getElementById('cp-new2').value;
+  if (!o || !n1) { showAlert('Enter your current password and the new one.'); return; }
+  if (n1 !== n2) { showAlert('The two new passwords do not match.'); return; }
+  if (n1.length < 6) { showAlert('The new password must have at least 6 characters.'); return; }
+  try { await api('changePassword', { oldPassword: o, newPassword: n1 }); }
+  catch (e) { showAlert(e.message, 'Not changed'); return; }
+  cm('m-chpw');
+  await showAlert('Your password was changed. Please log in again with the new password.', 'Password changed');
+  doLogout();
+}
+
+// ── Users (Admin) ──
+var _users = [], _editUserId = null;
+async function openUsers() {
+  if (!isAdmin()) return;
+  document.getElementById('us-list').innerHTML = '<div style="padding:16px;color:var(--tx3);text-align:center">Loading&hellip;</div>';
+  om('m-users');
+  try { var r = await api('listUsers'); _users = r.users; renderUsers(); }
+  catch (e) { document.getElementById('us-list').innerHTML = '<div style="padding:16px;color:var(--rd)">' + esc(e.message) + '</div>'; }
+}
+var ROLE_HELP = {
+  admin: 'Sees and edits everything; manages users',
+  md: 'Sees everything; Cash LC is view-only; no limit, restore or users',
+  commercial: 'Banking \u2192 Opened LCs only: adds and amends LCs'
+};
+function renderUsers() {
+  document.getElementById('us-list').innerHTML = '<table class="mini"><thead><tr><th>Name</th><th>Role</th><th>Status</th><th>Last login</th><th></th></tr></thead><tbody>'
+    + _users.map(function(u){
+      return '<tr><td style="font-weight:600">' + esc(u.name) + (u.id === AUTH.user.id ? ' <span class="chip n">you</span>' : '') + '</td>'
+        + '<td>' + esc(u.roleName) + '<div style="font-size:10.5px;color:var(--tx3)">' + esc(ROLE_HELP[u.role] || '') + '</div></td>'
+        + '<td>' + (u.active ? '<span class="chip g">Active</span>' : '<span class="chip r">Disabled</span>') + '</td>'
+        + '<td>' + (u.lastLogin ? formatRatesTimestamp(u.lastLogin) : '\u2014') + '</td>'
+        + '<td style="text-align:right"><button class="btn bed bsm" onclick="openUserEdit(\'' + jsq(u.id) + '\')">Edit</button></td></tr>';
+    }).join('') + '</tbody></table>';
+}
+function openUserEdit(id) {
+  _editUserId = id || null;
+  var u = _users.find(function(x){ return x.id === id; }) || { name: '', role: 'commercial', active: true };
+  document.getElementById('ue-title').textContent = id ? 'Edit user \u2014 ' + u.name : 'Add user';
+  document.getElementById('ue-name').value = u.name;
+  document.getElementById('ue-role').value = u.role;
+  document.getElementById('ue-active').value = u.active ? 'yes' : 'no';
+  document.getElementById('ue-pw').value = '';
+  document.getElementById('ue-pw-label').textContent = id ? 'New password (leave empty to keep the current one)' : 'Password';
+  document.getElementById('ue-help').textContent = ROLE_HELP[u.role] || '';
+  om('m-user-edit');
+  setTimeout(function(){ document.getElementById('ue-name').focus(); }, 120);
+}
+async function svUserEdit() {
+  var body = { id: _editUserId || '', name: document.getElementById('ue-name').value.trim(), role: document.getElementById('ue-role').value,
+    active: document.getElementById('ue-active').value === 'yes', password: document.getElementById('ue-pw').value };
+  try { var r = await api('saveUser', body); _users = r.users; renderUsers(); cm('m-user-edit'); showSync('ok', 'User saved'); }
+  catch (e) { showAlert(e.message, 'Not saved'); }
 }
 
 // ═══ SECTION: THEME TOGGLE (light/dark) ═══
@@ -1517,6 +1654,7 @@ var _mutationSeq = 0, _inflightMutations = 0;
 
 async function api(action, body={}) {
   body.action=action;
+  if (AUTH.token && body.token === undefined) body.token = AUTH.token;
   var isMutation = !!MUTATING_ACTIONS[action];
   if (isMutation) { _mutationSeq++; _inflightMutations++; }
   try {
@@ -1529,7 +1667,10 @@ async function api(action, body={}) {
       // needs re-authorizing or a quota is hit — say so instead of a cryptic parse error.
       throw new Error('Server sent an unexpected response (HTTP ' + res.status + '). The Apps Script deployment may need re-authorizing.');
     }
-    if(data.error) throw new Error(data.error);
+    if(data.error) {
+      if (data.code === 'AUTH' && action !== 'login' && action !== 'loginUsers') sessionEnded();
+      throw new Error(data.error);
+    }
     // The server now stamps the module's "last updated" time itself, inside
     // the same request — just reflect it on screen, no second request needed.
     var touchedModule = MODULE_ACTIVITY_MAP[action];
@@ -1594,10 +1735,10 @@ function FD(d) {
 // ── Data cache helpers ──
 var CACHE_KEY = 'fin_cache_v1';
 function saveToCache(data) {
-  try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+  try { localStorage.setItem(cacheKey(), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
 }
 function loadFromCache() {
-  try { var c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return c && c.data ? c.data : null; } catch(e) { return null; }
+  try { var c = JSON.parse(localStorage.getItem(cacheKey()) || 'null'); return c && c.data ? c.data : null; } catch(e) { return null; }
 }
 function applyData(data) {
   ST.parties = data.parties || [];
@@ -1682,6 +1823,7 @@ async function initApp() {
   // Stored on LOANS._loading so that if the user navigates to Loans WHILE
   // this is still in flight, navigate() awaits this SAME request instead
   // of firing a second, duplicate one.
+  if (isCom()) return;   // Commercial only has Banking
   LOANS._loading = loadLoansData().catch(function(){}).finally(function(){ LOANS._loading = null; });
 
   // Same silent background preload for FDR
@@ -1813,7 +1955,9 @@ async function navigate(pg,pid) {
   // Cash LC needs its PIN (2803) BEFORE anything on screen changes —
   // previously the current page was hidden first, so cancelling the PIN
   // left a completely blank screen.
-  if ((pg === 'dashboard' || pg === 'party') && !cashLCUnlocked) {
+  if (isCom() && pg !== 'banking') { pg = 'banking'; pid = 'opened'; }
+  if (isCom() && pg === 'banking') pid = 'opened';
+  if ((pg === 'dashboard' || pg === 'party') && !cashLCUnlocked && !isMD()) {
     var pinOk = await checkPin('2803');
     if (!pinOk) return;
     cashLCUnlocked = true;
@@ -2106,7 +2250,7 @@ function rDT(){
         +'<td class="r mn" style="color:var(--rd);font-weight:500">'+F(total)+'</td>'
         +'<td>'+pl.doc+'</td><td>'+pl.accept+'</td><td>'+ppBadge+'</td><td>'+pl.pay+'</td>'
         +'<td class="no-print">'+matCell+'</td>'
-        +'<td>'+dlvCell+'</td>'
+        +'<td>'+(canEditCash() ? dlvCell : dlvCell.replace(/ onclick="[^"]*"/g, ''))+'</td>'
         +'<td class="note-cell '+(r.notes?'':'empty')+'" title="'+esc(r.notes||'')+'">'+esc(r.notes||'\u2014')+'</td>'
         +actions+'</tr>';
     } else {
@@ -2193,6 +2337,7 @@ function clearRBf(){document.getElementById('rbf').value='';document.getElementB
 
 
 async function addCr(){
+  if (!canEditCash()) return;
   const p=ST.parties.find(x=>x.id===ST.cParty); if(!p) return;
   const d=document.getElementById('crd').value, a=NUM(document.getElementById('cra').value);
   const t=(document.getElementById('crt').value||'').trim()||'NRBC-1812';
@@ -2215,6 +2360,7 @@ async function addCr(){
 }
 
 async function dCr(id){
+  if (!canEditCash()) return;
   if(!await checkPin()) return;
   const i=ST.credits.findIndex(x=>x.id===id); if(i<0) return;
   const _cr=ST.credits[i];
@@ -2226,6 +2372,7 @@ async function dCr(id){
 }
 
 async function delLC(id){
+  if (!canEditCash()) return;
   const d=ST.debits.find(x=>x.id===id); if(!d) return;
   if(!await checkPin()) return;
   const a=debitAgg(d);
@@ -2237,6 +2384,7 @@ async function delLC(id){
 
 // ═══ SECTION: EDIT LC ═══
 function openEditLC(id){
+  if (!canEditCash()) return;
   const d = ST.debits.find(x => x.id === id);
   if (!d) return;
   ST.editLCId = id;
@@ -2334,6 +2482,7 @@ function onEditPartyTypeChange(){
   }
 }
 async function svLCEdit(){
+  if (!canEditCash()) return;
   const d = ST.debits.find(x => x.id === ST.editLCId);
   if (!d) { showAlert('Could not find LC to edit.'); return; }
   const targetName = (document.getElementById('le-party-name').value || '').trim();
@@ -2370,6 +2519,7 @@ async function svLCEdit(){
 
 // ═══ SECTION: EDIT CREDIT ═══
 function openEditCr(id){
+  if (!canEditCash()) return;
   const r=ST.credits.find(x=>x.id===id); if(!r) return;
   ST.editCrId=id;
   refreshTypeDropdowns(r.type);
@@ -2379,6 +2529,7 @@ function openEditCr(id){
   om('m-cr-edit');
 }
 async function svCrEdit(){
+  if (!canEditCash()) return;
   const r=ST.credits.find(x=>x.id===ST.editCrId); if(!r) return;
   r.date=document.getElementById('ce-date').value;
   r.amt=NUM(document.getElementById('ce-amt').value);
@@ -2713,6 +2864,7 @@ function cm(id){var m=document.getElementById(id);m.classList.remove('open');var
 document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open')}));
 
 function openAddParty(){
+  if (!canEditCash()) return;
   ST.editPIdx=null;
   document.getElementById('pm-title').textContent='Add New Party';
   document.getElementById('pm-n').value=''; document.getElementById('pm-p').value='';
@@ -2721,6 +2873,7 @@ function openAddParty(){
   om('m-party');
 }
 function openEditParty(){
+  if (!canEditCash()) return;
   const p=ST.parties.find(x=>x.id===ST.cParty); if(!p) return;
   ST.editPIdx=ST.parties.indexOf(p);
   document.getElementById('pm-title').textContent='Edit Party';
@@ -2731,6 +2884,7 @@ function openEditParty(){
   om('m-party');
 }
 async function svParty(){
+  if (!canEditCash()) return;
   var name=document.getElementById('pm-n').value.trim();
   var pv=NUM(document.getElementById('pm-p').value), sd=document.getElementById('pm-s').value;
   var pt=document.getElementById('pm-type').value||'accessories';
@@ -2753,6 +2907,7 @@ async function svParty(){
 var _lcLedgerOptions = []; // sibling party records (same name) available for this Add LC session
 
 function openAddLC(){
+  if (!canEditCash()) return;
   ST.editLCId = null;
   document.getElementById('lc-modal-title').textContent = 'Add New L/C Entry';
   const btn = document.getElementById('lc-save-btn');
@@ -2818,6 +2973,7 @@ function rememberRateFor(partyId, rate) {
 }
 
 async function svLC(){
+  if (!canEditCash()) return;
   const d     = (document.getElementById('ld').value||'').trim();
   const lc    = (document.getElementById('ln').value||'').trim();
   const co    = (document.getElementById('lco').value||'').trim();
@@ -2853,6 +3009,7 @@ async function svLC(){
 // ═══ SECTION: DELIVERY TRACKING (fabric parties) ═══
 let _dlvId = null;
 async function oDLV(id){
+  if (!canEditCash()) return;
   _dlvId = id;
   const d = ST.debits.find(x => x.id === id); if(!d) return;
   const p = ST.parties.find(x => x.id === ST.cParty);
@@ -2871,6 +3028,7 @@ async function oDLV(id){
 }
 
 async function svDlv(){
+  if (!canEditCash()) return;
   const d = ST.debits.find(x => x.id === _dlvId); if(!d) return;
   const qty = parseInt(document.getElementById('dlv-qty').value);
   if (!qty || qty < 1) { showAlert('Enter a valid quantity.'); return; }
@@ -3798,6 +3956,7 @@ function finApplyLoad(data) {
   FIN.backup = data.backup || {};
   FIN.canRollback = !!data.canRollback;
   FIN.convertedAt = data.convertedAt || '';
+  FIN.lcNos = data.lcNos || null;
   var c = { parties: {}, debits: {}, lcs: {}, docs: {} };
   (data.parties || []).forEach(function(p){ c.parties[String(p.id)] = p; });
   (data.debits || []).forEach(function(d){ var x = finNormDebit(d); c.debits[x.id] = x; });
@@ -3856,6 +4015,7 @@ function lcAction(op) {
 }
 
 async function finPost(body) {
+  if (AUTH.token) body = Object.assign({}, body, { token: AUTH.token });
   var res = await fetch(SHEET_URL, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'text/plain' } });
   var text = await res.text();
   try { return JSON.parse(text); }
@@ -3888,6 +4048,7 @@ async function finPump() {
       finRederive();
       finRenderAll();
     } else {
+      if (res && res.code === 'AUTH') { FIN.queue = []; FIN.busy = false; sessionEnded(); return; }
       failed = res || { error: 'No answer from the server' };
       FIN.queue = [];
       FIN.needReload = true;
@@ -4078,14 +4239,14 @@ function renderOpenedLCs() {
       + '<td class="cmp" style="font-size:11px;white-space:normal">' + esc(l.buyerName || '\u2014') + '</td>'
       + '<td class="dm">' + FD(l.expiryDate) + '</td>'
       + '<td class="r mn">' + UC(a.usd) + '</td>'
-      + '<td style="cursor:pointer" onclick="openLcDocs(\'' + jsq(id) + '\')" title="Show the documents">' + progressCell(a) + '</td>'
-      + '<td class="r mn" style="font-weight:600">' + UC(a.waiting) + '<div style="font-size:10.5px;color:var(--tx3);font-weight:400">' + TKc(a.waiting) + '</div></td>'
-      + '<td>' + partyTag(id) + '</td>'
+      + '<td class="col-docs" style="cursor:pointer" onclick="openLcDocs(\'' + jsq(id) + '\')" title="Show the documents">' + progressCell(a) + '</td>'
+      + '<td class="r mn col-wait" style="font-weight:600">' + UC(a.waiting) + '<div style="font-size:10.5px;color:var(--tx3);font-weight:400">' + TKc(a.waiting) + '</div></td>'
+      + '<td class="col-party">' + partyTag(id) + '</td>'
       + '<td class="no-print act"><div class="aw">'
-      + '<button class="btn bp bsm" onclick="openDocsArrived(\'' + jsq(id) + '\')">Docs arrived &rarr;</button>'
+      + (isCom() ? '' : '<button class="btn bp bsm" onclick="openDocsArrived(\'' + jsq(id) + '\')">Docs arrived &rarr;</button>')
       + '<button class="btn bed bsm" onclick="openEditBankLC(\'' + jsq(id) + '\')">Edit</button>'
-      + (a.received > 0 ? '<button class="btn bg bsm" onclick="openCloseLC(\'' + jsq(id) + '\')" title="No more documents will come">Close LC</button>' : '')
-      + '<button class="btn bdg bsm" onclick="delBankLC(\'' + jsq(id) + '\')" title="Delete (PIN)">&times;</button>'
+      + (a.received > 0 && !isCom() ? '<button class="btn bg bsm" onclick="openCloseLC(\'' + jsq(id) + '\')" title="No more documents will come">Close LC</button>' : '')
+      + (isCom() || (!canEditCash() && a.debitId) ? '' : '<button class="btn bdg bsm" onclick="delBankLC(\'' + jsq(id) + '\')" title="Delete (PIN)">&times;</button>')
       + '</div></td></tr>';
   }).join('');
   document.getElementById('op-total').textContent = UC(tw) + ' / ' + TKc(tw);
@@ -4566,7 +4727,8 @@ function pickBLCType(v) { document.getElementById('blc-type').value = v; var dd 
 function handleBLCTypeKey(e) { if (e.key === 'Escape') hideBLCType(); }
 function checkBankDupLC() {
   var no = (document.getElementById('blc-lcno').value || '').trim(), msg = document.getElementById('blc-dup-msg');
-  var exists = no && Object.keys(FIN.state.lcs).some(function(id){ return id !== BANK.editLcId && String(FIN.state.lcs[id].lcNo).trim() === no; });
+  var exists = no && (Object.keys(FIN.state.lcs).some(function(id){ return id !== BANK.editLcId && String(FIN.state.lcs[id].lcNo).trim() === no; })
+    || (FIN.lcNos || []).some(function(x){ return String(x).trim() === no && !(BANK.editLcId && FIN.state.lcs[BANK.editLcId] && String(FIN.state.lcs[BANK.editLcId].lcNo).trim() === no); }));
   msg.style.display = exists ? '' : 'none';
 }
 function toggleBLCCash() {
@@ -4636,7 +4798,7 @@ async function svBankLC() {
   };
   if (!f.date || !f.lcNo || !(f.usd > 0)) { showAlert('Date, LC number and the LC value (USD) are required.'); return; }
   registerNewBLCType(f.type); registerNewBLCBuyer(f.buyerName); if (f.supplier) saveNewCompany(f.supplier);
-  var isCash = document.getElementById('blc-is-cash').checked, debit = null;
+  var isCash = canEditCash() && document.getElementById('blc-is-cash').checked, debit = null;
   if (isCash) {
     var rate = NUM(document.getElementById('blc-rate').value) || 129, comm = NUM(document.getElementById('blc-commission').value);
     var partyId = document.getElementById('blc-party').value;
@@ -4659,6 +4821,7 @@ async function svBankLC() {
 async function delBankLC(id) {
   var l = lcOf(id), a = aggOf(id); if (!l) return;
   if (a.nPaid) { showAlert('LC ' + l.lcNo + ' has ' + a.nPaid + ' paid document' + (a.nPaid > 1 ? 's' : '') + ' in Completed Payments, so it cannot be deleted. Undo those payments first, or use Close LC instead.', 'Cannot delete'); return; }
+  if (!canEditCash() && debitOfLc(id)) { showAlert('This LC has a Cash LC entry, so only Admin can delete it.', 'Cannot delete'); return; }
   if (!await checkPin()) return;
   var db = debitOfLc(id);
   if (!await showConfirm('Delete LC ' + l.lcNo + (a.docs.length ? ' and its ' + a.docs.length + ' document(s)' : '') + (db ? '? Its Cash LC entry under ' + lcPartyLabel(id) + ' is deleted too.' : '?'), 'Delete LC', 'Delete')) return;
@@ -4667,6 +4830,7 @@ async function delBankLC(id) {
 
 // Limit (PIN 388)
 async function editBankLimit() {
+  if (!isAdmin()) { showAlert('Only Admin can change the limit.'); return; }
   if (!await checkPin()) return;
   document.getElementById('lim-input').value = FIN.limit || '';
   om('m-limit');
@@ -4700,6 +4864,7 @@ function cashPillsHtml(r) {
   var pay = v.pay === 'full' ? '<span class="pill b" onclick="cashPayPill(\'' + id + '\')">Paid \u2713</span>'
     : v.pay === 'partial' ? '<span class="pill p" onclick="cashPayPill(\'' + id + '\')">Part paid</span>'
     : '<span class="pill d" onclick="cashPayPill(\'' + id + '\')">Due</span>';
+  if (!canEditCash()) { var off = function(h){ return h.replace(/ onclick="[^"]*"/g, ''); }; doc = off(doc); accept = off(accept); pay = off(pay); }
   return { doc: doc, accept: accept, pay: pay, v: v };
 }
 function cashDocPill(debitId) {
@@ -4775,6 +4940,7 @@ function lcHealthIssues() {
 }
 var _healthIssues = [];
 function openLCHealthCheck() {
+  if (isCom()) return;
   _healthIssues = lcHealthIssues();
   var n = { fix: 0, check: 0, info: 0 };
   _healthIssues.forEach(function(x){ n[x.level]++; });
@@ -4834,6 +5000,7 @@ function openFullLCSearch(query) {
   if (inp) setTimeout(function(){ inp.focus(); }, 150);
 }
 function openLCSearch() {
+  if (isCom()) return;
   document.getElementById('lc-search-input').value = '';
   document.getElementById('lc-search-results').innerHTML = '<p style="color:var(--tx3);text-align:center;padding:24px">Type an LC number to search</p>';
   om('m-lc-search');
@@ -5009,7 +5176,7 @@ async function restoreBackup(id, name) {
   showSync('saving', 'Restoring...');
   try { await api('restoreBackup', { fileId: id, pin: '388' }); }
   catch (e) { showSync('err', 'Restore failed'); showAlert('Restore failed: ' + e.message); return; }
-  try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
+  clearFinCaches();
   showSync('ok', 'Restored');
   await showAlert('The backup was restored. The page will now reload.', 'Restored');
   location.reload();
@@ -5031,7 +5198,7 @@ async function undoConversion() {
   showSync('saving', 'Undoing the upgrade...');
   try { var r = await api('rollbackConversion', { pin: '388' }); }
   catch (e) { showSync('err', 'Failed'); showAlert(e.message); return; }
-  try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
+  clearFinCaches();
   await showAlert('The upgrade was undone. Open the old app to continue as before.', 'Done');
   location.reload();
 }
@@ -5039,6 +5206,7 @@ async function undoConversion() {
 // ═══ SECTION: ONE-TIME CONVERSION PAGE ═══
 var _convReport = null;
 async function runConversionCheck() {
+  if (!isAdmin()) { showAlert('Admin needs to finish the one-time upgrade first.'); return; }
   var box = document.getElementById('conv-report');
   box.innerHTML = '<div class="sw" style="padding:20px;color:var(--tx3)">Checking every record&hellip; this can take a minute.</div>';
   document.getElementById('conv-run').disabled = true;
@@ -5094,7 +5262,7 @@ async function convertNowClick() {
     var r = await finPost({ action: 'convertNow', pin: '388' });
     if (r.error) { showSync('err', 'Not converted'); if (r.report) { _convReport = r.report; renderConversionReport(); } showAlert(r.error, 'Not converted'); return; }
   } catch (e) { showSync('err', 'Not converted'); showAlert('No answer from the server: ' + e.message + '\n\nRun the check again to see whether the conversion happened.'); return; }
-  try { localStorage.removeItem(CACHE_KEY); } catch (e) {}
+  clearFinCaches();
   showSync('ok', 'Converted');
   await finReload(true);
   await showAlert('Done. The LC data now uses documents. Accepted documents with no maturity date are listed in the Health Check.', 'Converted');
@@ -7668,9 +7836,13 @@ applyTheme();
 updateConnStatus(); // show the offline banner straight away if the page opens offline
 if(checkSession()){
   document.getElementById('login-screen').classList.add('hidden');
-  // Banking is already active by default (from HTML), start loading
-  startTimer(parseInt(sessionStorage.getItem(SK_SESSION)));
+  applyRole();
+  if (isCom()) setBankSub('opened');
+  startTimer(AUTH.exp);
   initApp();
+} else {
+  try { var _lm = sessionStorage.getItem('fin_logout_msg'); if (_lm) { document.getElementById('pw-err').textContent = _lm; sessionStorage.removeItem('fin_logout_msg'); } } catch (e) {}
+  loadLoginUsers();
 }
 </script>
 
@@ -7946,6 +8118,47 @@ if(checkSession()){
   </div>
 </div>
 
+
+<!-- CHANGE PASSWORD -->
+<div class="modal-overlay" id="m-chpw">
+  <div class="modal" style="width:400px">
+    <div class="mh"><h2>Change password</h2><button class="mcl" onclick="cm('m-chpw')">&#x2715;</button></div>
+    <div class="mb">
+      <div class="mfg"><label>Current password</label><input type="password" id="cp-old" autocomplete="current-password"></div>
+      <div class="mfg"><label>New password (at least 6 characters)</label><input type="password" id="cp-new" autocomplete="new-password"></div>
+      <div class="mfg"><label>New password again</label><input type="password" id="cp-new2" autocomplete="new-password"></div>
+    </div>
+    <div class="mft"><button class="btn bg" onclick="cm('m-chpw')">Cancel</button><button class="btn bp" onclick="svChangePassword()">Change password</button></div>
+  </div>
+</div>
+
+<!-- USERS (Admin) -->
+<div class="modal-overlay" id="m-users">
+  <div class="modal" style="width:720px;max-width:calc(100vw - 32px)">
+    <div class="mh"><h2>Users</h2><button class="mcl" onclick="cm('m-users')">&#x2715;</button></div>
+    <p style="font-size:12.5px;color:var(--tx2);line-height:1.5;margin-bottom:10px">Each person logs in with their own name and password. Disabling someone or resetting their password logs them out at once.</p>
+    <div id="us-list" style="border:1px solid var(--bdr);border-radius:var(--r);overflow-x:auto"></div>
+    <div class="mft"><button class="btn bg" onclick="cm('m-users')">Close</button><button class="btn bp" onclick="openUserEdit()">+ Add user</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="m-user-edit">
+  <div class="modal" style="width:440px">
+    <div class="mh"><h2 id="ue-title">Add user</h2><button class="mcl" onclick="cm('m-user-edit')">&#x2715;</button></div>
+    <div class="mb">
+      <div class="mfg"><label>Name (shown on the login screen)</label><input type="text" id="ue-name" autocomplete="off"></div>
+      <div class="mr">
+        <div class="mfg"><label>Role</label>
+          <select id="ue-role" onchange="document.getElementById('ue-help').textContent=ROLE_HELP[this.value]||''">
+            <option value="admin">Admin</option><option value="md">Managing Director</option><option value="commercial">Commercial</option>
+          </select></div>
+        <div class="mfg"><label>Status</label><select id="ue-active"><option value="yes">Active</option><option value="no">Disabled</option></select></div>
+      </div>
+      <div style="font-size:11.5px;color:var(--tx3);margin-top:-4px" id="ue-help"></div>
+      <div class="mfg"><label id="ue-pw-label">Password</label><input type="password" id="ue-pw" autocomplete="new-password"></div>
+    </div>
+    <div class="mft"><button class="btn bg" onclick="cm('m-user-edit')">Cancel</button><button class="btn bp" onclick="svUserEdit()">Save</button></div>
+  </div>
+</div>
 
 <!-- REVIEW UNCHECKED LOANS MODAL — surfaces every Main Loan/PC/PAD entry not
      confirmed against this week's bank statement, so nothing lingers silently
