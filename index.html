@@ -543,6 +543,12 @@ details.conv summary{cursor:pointer;font-size:12px;color:var(--tx2);margin-top:4
 .act .aw{width:146px}
 .tw td.act{min-width:154px}
 .act .aw .btn{white-space:nowrap}
+.ld-acts{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;min-width:150px}
+.bs-l{white-space:nowrap}
+@media(max-width:768px){.bs-v{white-space:normal;font-size:16px}.bs-of{display:block;font-size:11.5px}.bs-wide{min-width:100%}}
+#bsub-opened .prog-t{font-size:10.5px}
+#bsub-opened .prog{min-width:88px}
+#bsub-opened td.cmp .chip{font-size:10px;padding:2px 6px}
 </style>
 </head>
 <body>
@@ -611,7 +617,7 @@ catch (e) { document.body.classList.add('light'); }
         <div class="nsi" id="nav-bsub-opened" onclick="navigate('banking','opened')"><span>Opened LCs</span><span class="cnt" id="cnt-opened"></span></div>
         <div class="nsi" id="nav-bsub-atbank" onclick="navigate('banking','atbank')"><span>Documents at Bank</span><span class="cnt" id="cnt-atbank"></span></div>
         <div class="nsi" id="nav-bsub-accepted" onclick="navigate('banking','accepted')"><span>Accepted Bills</span><span class="cnt" id="cnt-accepted"></span></div>
-        <div class="nsi" id="nav-bsub-history" onclick="navigate('banking','history')"><span>History</span><span class="cnt" id="cnt-history"></span></div>
+        <div class="nsi" id="nav-bsub-history" onclick="navigate('banking','history')"><span>Completed Payments</span><span class="cnt" id="cnt-history"></span></div>
       </div>
       <div class="ni" data-page="loans" onclick="navigate('loans')" id="nav-loans">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
@@ -693,7 +699,7 @@ catch (e) { document.body.classList.add('light'); }
       <!-- Slim strip: same on every Banking sub-page -->
       <div class="bstrip">
         <div class="bs-item">
-          <div class="bs-l">Total liability</div>
+          <div class="bs-l">Total accepted liability</div>
           <div class="bs-v" id="bs-liab">&#2547;0</div>
           <div class="bs-s" id="bs-liab-usd">$0.00 accepted, unpaid</div>
         </div>
@@ -759,7 +765,7 @@ catch (e) { document.body.classList.add('light'); }
       <!-- 3. Accepted Bills -->
       <div class="bank-sub" id="bsub-accepted" style="display:none">
         <div class="sw">
-          <div class="sw-h"><span class="sw-t">Accepted Bills</span><span class="sw-tot">Total liability: <b id="ac-total"></b></span></div>
+          <div class="sw-h"><span class="sw-t">Accepted Bills</span><span class="sw-tot">Total accepted liability: <b id="ac-total"></b></span></div>
           <div class="tw"><table>
             <thead><tr>
               <th>#</th><th>LC No.</th><th>Supplier</th><th>Company</th><th>Buyer</th><th class="r">USD</th><th class="r">BDT</th>
@@ -767,7 +773,7 @@ catch (e) { document.body.classList.add('light'); }
             </tr></thead>
             <tbody id="ac-tbody"></tbody>
             <tfoot><tr>
-              <td colspan="5" style="color:var(--tx3);font-size:10px;font-weight:400">Total liability</td>
+              <td colspan="5" style="color:var(--tx3);font-size:10px;font-weight:400">Total accepted liability</td>
               <td class="r" id="ac-foot-usd"></td><td class="r" id="ac-foot-bdt"></td><td colspan="4"></td>
             </tr></tfoot>
           </table></div>
@@ -2703,7 +2709,7 @@ function hidePartyNames(){
 
 // ═══ SECTION: MODALS (open/close, party, LC) ═══
 function om(id){document.getElementById(id).classList.add('open')}
-function cm(id){document.getElementById(id).classList.remove('open')}
+function cm(id){var m=document.getElementById(id);m.classList.remove('open');var a=document.activeElement;if(a&&m.contains(a)&&a.blur)a.blur();}
 document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open')}));
 
 function openAddParty(){
@@ -3611,6 +3617,14 @@ var LCM = (function () {
       return out;
     }
 
+    // Correction: remove a document recorded twice by mistake, whatever its
+    // status (paid ones too). The app asks for PIN 388 before this.
+    if (t === 'dismissDoc') {
+      var d11 = getDoc(state, op.docId);
+      delete state.docs[str(d11.id)]; out.removed.docs[d11.id] = true; touchLc(d11.bankLcId);
+      return out;
+    }
+
     if (t === 'acceptDocs' || t === 'payDocs') {
       var ids = (op.docIds || []).map(str);
       need(ids.length, 'BAD_INPUT', t === 'acceptDocs' ? 'Tick at least one document to accept.' : 'Tick at least one document to pay.');
@@ -4004,7 +4018,7 @@ var BANK_SUBS = {
   opened:   ['Opened LCs', 'Banking \u00b7 LCs waiting for their documents'],
   atbank:   ['Documents at Bank', 'Banking \u00b7 documents arrived, acceptance not given yet'],
   accepted: ['Accepted Bills', 'Banking \u00b7 accepted, awaiting payment (company liability)'],
-  history:  ['History', 'Banking \u00b7 paid documents and closed LCs'],
+  history:  ['Completed Payments', 'Banking \u00b7 paid documents and closed LCs'],
 };
 function setBankSub(sub) {
   BANK.sub = BANK_SUBS[sub] ? sub : 'opened';
@@ -4029,7 +4043,7 @@ function renderBankingPage() {
 function renderBankStrip() {
   var t = LCM.totals(FIN.state), rate = bRate();
   document.getElementById('bs-liab').textContent = TKc(t.liability);
-  document.getElementById('bs-liab-usd').textContent = UC(t.liability) + ' accepted, unpaid';
+  document.getElementById('bs-liab-usd').textContent = UC(t.liability) + ' accepted';
   var usedBdt = t.limit / 100 * rate, limit = FIN.limit;
   document.getElementById('bs-used').textContent = F(usedBdt);
   document.getElementById('bs-limit').textContent = limit ? F(limit) : 'not set';
@@ -4267,7 +4281,7 @@ async function runLc(op) {
 var _daLcId = null;
 function openDocsArrived(lcId) {
   var l = lcOf(lcId), a = aggOf(lcId); if (!l) return;
-  if (a.closed) { showAlert('LC ' + l.lcNo + ' is closed. Reopen it (History \u2192 Closed LCs) to add documents.'); return; }
+  if (a.closed) { showAlert('LC ' + l.lcNo + ' is closed. Reopen it (Completed Payments \u2192 Closed LCs) to add documents.'); return; }
   _daLcId = lcId;
   document.getElementById('da-title').textContent = 'Documents arrived \u2014 LC ' + l.lcNo;
   document.getElementById('da-info').innerHTML = lcInfoBox(lcId);
@@ -4457,6 +4471,17 @@ async function svEditDoc() {
   if (await runLc(op)) addAudit('edit', 'Edited document on LC <strong>' + esc(docLcNo(d)) + '</strong>');
 }
 
+// Remove a document recorded twice by mistake (any status; PIN 388)
+async function dismissDoc(docId) {
+  var d = FIN.state.docs[docId]; if (!d) return;
+  if (!await checkPin()) return;
+  if (!await showConfirm('Remove this ' + (d.status === 'atbank' ? 'document at bank' : d.status + ' document') + ' of ' + UC(LCM.cents(d.usd)) + ' on LC ' + docLcNo(d) + '?\n\nUse this only for a document recorded twice by mistake. It is deleted, not undone.', 'Remove duplicate document', 'Remove')) return;
+  if (await runLc({ type: 'dismissDoc', docId: docId })) {
+    addAudit('del', 'Removed duplicate document ' + UC(LCM.cents(d.usd)) + ' (' + d.status + ') from LC <strong>' + esc(docLcNo(d)) + '</strong>');
+    if (document.getElementById('m-lc-health').classList.contains('open')) openLCHealthCheck();
+  }
+}
+
 // Close / reopen
 var _clLcId = null;
 function openCloseLC(lcId) {
@@ -4495,7 +4520,9 @@ function renderLcDocs() {
         : d.status === 'accepted'
           ? '<button class="btn bp bsm" onclick="cm(\'m-lc-docs\');openPayDocs(\'' + jsq(lcId) + '\',\'' + jsq(d.id) + '\')">Pay</button> <button class="btn bdg bsm" onclick="cm(\'m-lc-docs\');undoAcceptance(\'' + jsq(d.id) + '\')">Undo</button>'
           : '<button class="btn bdg bsm" onclick="cm(\'m-lc-docs\');undoPayment(\'' + jsq(d.id) + '\')">Undo payment</button>';
-      return '<tr><td>' + FD(d.arrivedDate) + '</td><td class="r"><b>' + UC(LCM.cents(d.usd)) + '</b></td><td>' + statusChip(d.status) + '</td><td>' + FD(d.acceptedDate) + '</td><td>' + (d.status === 'accepted' ? (d.maturityDate ? FD(d.maturityDate) + ' ' : '') + maturityBadge(d) : FD(d.maturityDate)) + '</td><td>' + FD(d.paidDate) + '</td><td style="white-space:nowrap">' + btns + '</td></tr>';
+      var dupe = docs.filter(function(x){ return LCM.cents(x.usd) === LCM.cents(d.usd); }).length > 1;
+      btns += ' <button class="btn bdg bsm" onclick="dismissDoc(\'' + jsq(d.id) + '\')" title="Recorded twice by mistake (PIN)">Remove duplicate</button>';
+      return '<tr' + (dupe ? ' style="background:var(--ambg)"' : '') + '><td>' + FD(d.arrivedDate) + '</td><td class="r"><b>' + UC(LCM.cents(d.usd)) + '</b>' + (dupe ? ' <span class="chip a">same amount</span>' : '') + '</td><td>' + statusChip(d.status) + '</td><td>' + FD(d.acceptedDate) + '</td><td>' + (d.status === 'accepted' ? (d.maturityDate ? FD(d.maturityDate) + ' ' : '') + maturityBadge(d) : FD(d.maturityDate)) + '</td><td>' + FD(d.paidDate) + '</td><td><div class="ld-acts">' + btns + '</div></td></tr>';
     }).join('') + '</tbody></table>'
     : '<div style="padding:16px;text-align:center;color:var(--tx3);font-size:12.5px">No documents have arrived for this LC yet.</div>';
   document.getElementById('ld-actions').innerHTML =
@@ -4631,7 +4658,7 @@ async function svBankLC() {
 }
 async function delBankLC(id) {
   var l = lcOf(id), a = aggOf(id); if (!l) return;
-  if (a.nPaid) { showAlert('LC ' + l.lcNo + ' has ' + a.nPaid + ' paid document' + (a.nPaid > 1 ? 's' : '') + ' in History, so it cannot be deleted. Undo those payments first, or use Close LC instead.', 'Cannot delete'); return; }
+  if (a.nPaid) { showAlert('LC ' + l.lcNo + ' has ' + a.nPaid + ' paid document' + (a.nPaid > 1 ? 's' : '') + ' in Completed Payments, so it cannot be deleted. Undo those payments first, or use Close LC instead.', 'Cannot delete'); return; }
   if (!await checkPin()) return;
   var db = debitOfLc(id);
   if (!await showConfirm('Delete LC ' + l.lcNo + (a.docs.length ? ' and its ' + a.docs.length + ' document(s)' : '') + (db ? '? Its Cash LC entry under ' + lcPartyLabel(id) + ' is deleted too.' : '?'), 'Delete LC', 'Delete')) return;
@@ -4717,9 +4744,9 @@ function lcHealthIssues() {
   });
   Object.keys(idx.byLc).forEach(function(id){
     var a = idx.byLc[id], l = a.lc;
-    if (a.over) add('check', 'More documents than the LC value', l.lcNo, 'Documents add up to ' + UC(a.received) + ' but the LC is ' + UC(a.usd) + ' (' + UC(a.over) + ' over).', 'Check for a duplicate document, or edit the LC value.', goLc(id));
+    if (a.over) add('check', 'More documents than the LC value', l.lcNo, 'Documents add up to ' + UC(a.received) + ' but the LC is ' + UC(a.usd) + ' (' + UC(a.over) + ' over).', 'Go to opens its documents; same amounts are highlighted. Press Remove duplicate on the copy (PIN 388), or edit the LC value if the LC is really larger.', goLc(id));
   });
-  idx.orphans.forEach(function(d){ add('fix', 'Document of a deleted LC', d.lcNo, 'A ' + (d.status === 'atbank' ? 'document at bank' : d.status + ' document') + ' of ' + UC(LCM.cents(d.usd)) + ' belongs to an LC that no longer exists.' + (d.status === 'accepted' ? ' It still counts in Total Liability.' : ''), d.status === 'accepted' ? 'Pay it if it is real, otherwise Undo it.' : 'Undo it if it is not real.', goDoc(d)); });
+  idx.orphans.forEach(function(d){ issues.push({ level: 'fix', kind: 'Document of a deleted LC', lcNo: String(d.lcNo || '-'), text: 'A ' + (d.status === 'atbank' ? 'document at bank' : d.status + ' document') + ' of ' + UC(LCM.cents(d.usd)) + ' belongs to an LC that was deleted in the old app.' + (d.status === 'accepted' ? ' It still counts in Total Accepted Liability.' : ''), fix: 'If the bill is real and still unpaid, keep it and Pay it when paid. Otherwise press Remove (PIN 388).', go: goDoc(d), fixLabel: 'Remove', fixFn: function(){ dismissDoc(d.id); } }); });
   var seen = {};
   Object.keys(st.lcs).forEach(function(id){
     var l = st.lcs[id], k = String(l.lcNo).trim() + '|' + LCM.cents(l.usd) + '|' + (l.company || '');
@@ -4763,6 +4790,7 @@ function openLCHealthCheck() {
       + '<div style="flex:1;min-width:0"><div style="font-size:12.5px"><span class="mn" style="font-weight:700">' + esc(x.lcNo) + '</span> &middot; <strong>' + esc(x.kind) + '</strong></div>'
       + '<div style="font-size:12px;color:var(--tx2);margin-top:3px;line-height:1.45">' + esc(x.text) + '</div>'
       + (x.fix ? '<div style="font-size:11.5px;color:var(--tx3);margin-top:3px;line-height:1.45">&rarr; ' + esc(x.fix) + '</div>' : '') + '</div>'
+      + (x.fixFn ? '<button class="btn bdg bsm" style="flex-shrink:0;margin-right:6px" onclick="_healthIssues[' + i + '].fixFn()">' + x.fixLabel + '</button>' : '')
       + (x.go ? '<button class="btn bg bsm" style="flex-shrink:0" onclick="_healthIssues[' + i + '].go()">Go to</button>' : '') + '</div>';
   }).join('');
   om('m-lc-health');
@@ -4907,11 +4935,11 @@ function printBanking() {
       return out + '<tr><td class="c">' + n + '</td>' + coTd(l) + '<td class="l b nw">' + esc(docLcNo(d)) + '</td><td class="l">' + esc(l.supplier || '\u2014') + '</td><td class="l">' + esc(l.buyerName || '\u2014') + '</td><td class="c">' + FDP(d.acceptedDate) + '</td><td class="c b">' + FDP(d.maturityDate) + (due ? ' \u2014 DUE' : '') + '</td><td class="r">' + UC(c) + '</td><td class="r b">' + TKp(c) + '</td>' + ptTd(d.bankLcId) + '</tr>';
     }).join('') || '<tr><td colspan="' + cols + '" class="c" style="color:#86868b;padding:14px">No accepted bills awaiting payment</td></tr>';
     html += '<div class="block-title">Accepted Bills \u2014 awaiting payment</div><table><thead><tr><th>#</th>' + coTh + '<th>LC No.</th><th>Supplier</th><th>Buyer</th><th>Accepted</th><th>Maturity</th><th class="r">USD</th><th class="r">BDT</th>' + ptTh + '</tr></thead><tbody>' + bodyAc + '</tbody>'
-      + '<tfoot><tr class="total"><td class="r" colspan="' + (6 + (both ? 1 : 0)) + '">Total liability</td><td class="r">' + UC(tC) + '</td><td class="r">' + TKp(tC) + '</td>' + (showParty ? '<td></td>' : '') + '</tr></tfoot></table>';
+      + '<tfoot><tr class="total"><td class="r" colspan="' + (6 + (both ? 1 : 0)) + '">Total accepted liability</td><td class="r">' + UC(tC) + '</td><td class="r">' + TKp(tC) + '</td>' + (showParty ? '<td></td>' : '') + '</tr></tfoot></table>';
   }
   var t = LCM.totals(FIN.state), bc = both ? { limit: t.limit, liability: t.liability } : (t.byCompany[co] || { limit: 0, liability: 0 });
   var summary = '<div class="combined-box"><div class="combined-row">'
-    + '<div class="combined-stat"><div class="lbl">Total liability (accepted, unpaid)</div><div class="val">' + TKp(bc.liability) + '</div></div>'
+    + '<div class="combined-stat"><div class="lbl">Total accepted liability</div><div class="val">' + TKp(bc.liability) + '</div></div>'
     + '<div class="combined-stat"><div class="lbl">Limit used</div><div class="val">' + TKp(bc.limit) + '</div></div>'
     + (both && FIN.limit ? '<div class="combined-stat"><div class="lbl">Of the limit</div><div class="val">' + Math.round(t.limit / 100 * rate / FIN.limit * 100) + '% of ' + F(FIN.limit) + '</div></div>' : '')
     + '</div></div>';
@@ -5072,6 +5100,76 @@ async function convertNowClick() {
   await showAlert('Done. The LC data now uses documents. Accepted documents with no maturity date are listed in the Health Check.', 'Converted');
   navigate('banking', 'opened');
 }
+
+// ═══ SECTION: ENTER KEY = DONE ═══
+// In a popup, Enter presses its main button (Save, Give acceptance, Pay, OK...).
+// In an "add" row (Loans, FDR, Creditors, Liability, Cash LC payments) Enter
+// presses that row's Add button. In a cell you edit in place, Enter saves it
+// (same as clicking somewhere else). Fields that already use Enter (PIN,
+// password, LC search, picking a highlighted suggestion) keep their own action.
+var _enterAt = 0;
+function enterPrimaryOf(modal) {
+  var btns = Array.prototype.slice.call(modal.querySelectorAll('.mft button, .mft .btn')).filter(function(b){
+    return b.offsetParent !== null && !b.disabled && !b.classList.contains('bg') && !/^(cancel|close)$/i.test(b.textContent.trim());
+  });
+  return btns.length ? btns[btns.length - 1] : null;
+}
+function enterAddButtonFor(el) {
+  var node = el.parentElement;
+  for (var i = 0; node && i < 6; i++, node = node.parentElement) {
+    if (node.classList && (node.classList.contains('page') || node.classList.contains('modal'))) break;
+    var b = Array.prototype.slice.call(node.querySelectorAll('[onclick]')).find(function(x){
+      return x.offsetParent !== null && /^\s*add\w*\(/.test(x.getAttribute('onclick') || '');
+    });
+    if (b) return b;
+  }
+  return null;
+}
+function enterAct(e, t, tag, modal) {
+  if (modal) {
+    if (modal.id === 'm-pin') return;
+    var b = enterPrimaryOf(modal);
+    if (!b || !modal.classList.contains('open')) return;
+    e.preventDefault(); _enterAt = Date.now();
+    if (tag === 'INPUT' || tag === 'SELECT') { try { t.blur(); } catch (x) {} }
+    b.click();
+    return;
+  }
+  if (tag !== 'INPUT' && tag !== 'SELECT') return;
+  if ((t.type || '') === 'checkbox' || (t.type || '') === 'file') return;
+  var add = /-add-|^cred-new-|^(crd|cra|crt|crr)$/.test(t.id || '') ? enterAddButtonFor(t) : null;
+  e.preventDefault(); _enterAt = Date.now();
+  try { t.blur(); } catch (x) {}                                              // commits inline edits
+  if (add) setTimeout(function(){ add.click(); }, 0);
+}
+function enterIgnored(e) { return e.key !== 'Enter' || e.isComposing || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey || !document.getElementById('login-screen').classList.contains('hidden'); }
+// Decided at the moment the key goes down (capture), before any field's own
+// handler runs: so one Enter can never act on a popup that opens because of it.
+var _enterPlan = new WeakMap();
+document.addEventListener('keydown', function(e) {
+  if (enterIgnored(e)) return;
+  var t = e.target || document.body, tag = (t.tagName || '').toUpperCase();
+  var open = Array.prototype.slice.call(document.querySelectorAll('.modal-overlay.open'));
+  var modal = open.length ? open[open.length - 1] : null;
+  if (e.repeat || Date.now() - _enterAt < 350) { e.preventDefault(); e.stopPropagation(); return; }
+  var stray = t !== document.body && ((modal && !modal.contains(t)) || (!modal && t.closest && t.closest('.modal-overlay')));
+  if (stray) {
+    // the cursor was left in a popup that has closed (e.g. the PIN box)
+    e.stopPropagation();
+    try { t.blur(); } catch (x) {}
+    enterAct(e, document.body, 'BODY', modal);
+    return;
+  }
+  if (tag === 'TEXTAREA' || tag === 'BUTTON' || tag === 'A') return;          // their own Enter
+  var own = (t.getAttribute && t.getAttribute('onkeydown')) || '';
+  if (/Enter/.test(own) && !/handle\w*Key/.test(own)) return;                // PIN, password, search...
+  _enterPlan.set(e, { t: t, tag: tag, modal: modal });
+}, true);
+document.addEventListener('keydown', function(e) {
+  var plan = _enterPlan.get(e);
+  if (!plan || e.defaultPrevented) return;                                    // a suggestion list took it
+  enterAct(e, plan.t, plan.tag, plan.modal);
+});
 
 // ═══════════════════════════════════════════════════════
 // FEATURE 11: CONNECTION INDICATOR
@@ -7767,10 +7865,10 @@ if(checkSession()){
 
 <!-- LC DOCUMENTS (all documents of one LC) -->
 <div class="modal-overlay" id="m-lc-docs">
-  <div class="modal" style="width:760px">
+  <div class="modal" style="width:880px;max-width:calc(100vw - 32px)">
     <div class="mh"><h2 id="ld-title">LC documents</h2><button class="mcl" onclick="cm('m-lc-docs')">&#x2715;</button></div>
     <div class="infobox" id="ld-info"></div>
-    <div id="ld-list" style="margin-top:12px"></div>
+    <div id="ld-list" style="margin-top:12px;overflow-x:auto"></div>
     <div class="mft" id="ld-actions"></div>
   </div>
 </div>
