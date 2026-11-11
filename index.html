@@ -622,6 +622,93 @@ td.mn .chip.flagchip{display:table;margin:3px 0 1px;font-family:inherit}
 .ud-bar span+span{font-weight:500}
 
 </style>
+<style>
+/* release 4 */
+body.role-commercial #nav-bsub-calendar{display:none!important}
+.v4-amt{font-variant-numeric:tabular-nums}
+.v4-sym{color:var(--tx3);margin-right:3px;font-size:.9em}
+.v4-lclink{cursor:pointer}
+.v4-lclink:hover{text-decoration:underline;color:var(--ac)!important}
+tr.v4-cash>td{background:var(--blbg)}
+tr.v4-cash>td:first-child{box-shadow:inset 5px 0 0 #2f6bff}
+tr.v4-edge-rd>td:first-child{box-shadow:inset 5px 0 0 #d92d20}
+.v4-solid{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:800;letter-spacing:.3px;white-space:nowrap;color:#fff;margin-top:2px}
+.v4-solid.rd{background:#d92d20}.v4-solid.am{background:#d97706}
+/* Loans, FDR, Creditors, Liability: larger text, tight columns, full width */
+#page-loans .tw table,#page-fdr .tw table,#page-creditors .tw table,#page-liability .tw table,
+#page-loans table,#page-fdr table,#page-creditors table,#page-liability table{width:100%}
+#page-loans td,#page-fdr td,#page-creditors td,#page-liability td{font-size:15px!important;padding:9px 12px!important}
+#page-loans th,#page-fdr th,#page-creditors th,#page-liability th{font-size:12.5px!important;padding:9px 12px!important;width:auto!important}
+#page-loans td.mn,#page-fdr td.mn{font-size:16.5px!important}
+#page-loans td input,#page-fdr td input,#page-creditors td input,#page-liability td input{font-size:16px!important;font-weight:700}
+#page-loans td select,#page-fdr td select,#page-creditors td select,#page-liability td select{font-size:14px!important}
+#page-loans .btn.bsm,#page-fdr .btn.bsm,#page-creditors .btn.bsm,#page-liability .btn.bsm{font-size:13px;padding:6px 11px}
+#page-loans td.r,#page-fdr td.r,#page-creditors td.r,#page-liability td.r,
+#page-loans td.no-print,#page-fdr td.no-print,#page-creditors td.no-print,#page-liability td.no-print{white-space:nowrap}
+#page-loans td.no-print,#page-fdr td.no-print,#page-creditors td.no-print,#page-liability td.no-print,
+#page-loans th.no-print,#page-fdr th.no-print,#page-creditors th.no-print,#page-liability th.no-print{width:1%!important}
+#page-creditors td:first-child,#page-liability td:nth-child(2){font-size:15.5px!important}
+/* Bond */
+.bond-sum{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--bdr)}
+.bond-sum>div{padding:14px 16px;border-right:1px solid var(--bdr)}.bond-sum>div:last-child{border-right:0}
+.bond-sum .bad{background:var(--rdbg)}.bond-sum .bad .sl,.bond-sum .bad .sv{color:var(--rd)}.bond-sum .good{background:var(--grbg)}
+.bond-sum .sl,.tl-cards .sl,.cal-cards .sl{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--tx3);font-weight:700;margin-bottom:5px}
+.bond-sum .sv,.tl-cards .sv,.cal-cards .sv{font-family:var(--numf,'DM Mono',monospace);font-size:18px;font-weight:500}
+.bond-sum .ss,.cal-cards .ss{font-size:11.5px;color:var(--tx3);margin-top:3px}
+.bond-bar{height:7px;border-radius:99px;background:var(--bg3);overflow:hidden;margin-top:6px}.bond-bar i{display:block;height:100%;background:var(--gr);border-radius:99px}
+.bond-fbar{display:flex;gap:8px;align-items:center;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--bdr);flex-wrap:wrap}
+.bond-fbar .lbl{font-size:11px;color:var(--tx3);font-weight:700;text-transform:uppercase}
+table.bond-t{width:100%;border-collapse:collapse}
+table.bond-t th{font-size:11.5px;text-align:left;padding:9px 10px;background:var(--bg3);border-bottom:1px solid var(--bdr2)}
+table.bond-t td{padding:9px 10px;border-bottom:1px solid var(--bdr);font-size:13px;vertical-align:middle}
+table.bond-t .r{text-align:right}
+table.bond-t tr.bond-tot td{background:var(--bg3);font-weight:700}
+table.bond-t input{background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:7px 9px;border-radius:7px;font-size:13px;outline:none;width:100%}
+.bond-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.bond-ro{padding:9px 11px;border-radius:8px;background:var(--bg3);font-family:var(--numf,'DM Mono',monospace);font-size:13px}
+.bond-calc{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--bg3);border-radius:10px;padding:11px 14px;margin-top:4px;font-size:13px}
+#tab-bond-cnt{background:var(--rd);color:#fff;border-radius:99px;padding:1px 7px;font-size:10.5px;margin-left:5px}
+/* Timeline */
+.tl-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.tl-cards>div{border:1px solid var(--bdr);border-radius:12px;padding:12px 14px;background:var(--bg2)}
+.tl-cards>div.bad{background:var(--rdbg)}.tl-cards>div.bad .sl,.tl-cards>div.bad .sv{color:var(--rd)}
+.tl-wrap{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
+.tl-box{border:1px solid var(--bdr);border-radius:12px;background:var(--bg2);overflow:hidden;margin-bottom:14px}
+.tl-bh{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--bdr)}
+.tl{position:relative;margin-left:8px;padding-left:24px;border-left:3px solid var(--bdr2)}
+.tl .ev{position:relative;padding:0 0 18px}
+.tl .ev:before{content:'';position:absolute;left:-33px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--gr);border:3px solid var(--bg2);box-shadow:0 0 0 2px var(--gr)}
+.tl .ev.pend:before{background:var(--bg2);box-shadow:0 0 0 2px var(--bdr2)}
+.tl .ev.warn:before{background:#d92d20;box-shadow:0 0 0 2px #d92d20}
+.tl .ev .d{font-size:11.5px;color:var(--tx3);font-weight:600}
+.tl .ev .t{font-size:14.5px;font-weight:700;margin:1px 0}
+.tl .ev.warn .t{color:#d92d20}.tl .ev.pend .t{color:var(--tx2)}
+.tl .ev .x{font-size:12.5px;color:var(--tx2)}
+/* Maturity calendar */
+.cal-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cal-nav{display:flex;gap:8px;align-items:center}.cal-nav b{font-size:16px;min-width:150px;text-align:center}
+.cal-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.cal-cards>div{border:1px solid var(--bdr);border-radius:12px;padding:12px 14px;background:var(--bg2)}
+.cal-cards>div.bad{background:var(--rdbg)}.cal-cards>div.bad .sl,.cal-cards>div.bad .sv{color:var(--rd)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal>div{border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);min-height:92px;padding:7px 9px;background:var(--bg2)}
+.cal>div:nth-child(7n){border-right:0}
+.cal .hd{min-height:0;background:var(--bg3);font-size:11px;font-weight:800;text-transform:uppercase;color:var(--tx2)}
+.cal .off{background:var(--bg3);opacity:.5}
+.cal .dn{font-size:13px;font-weight:700;color:var(--tx2)}
+.cal .has{cursor:pointer}.cal .has:hover{background:var(--bg3)}
+.cal .amt{font-family:var(--numf,'DM Mono',monospace);font-size:14px;font-weight:600;margin-top:6px}
+.cal .cnt{font-size:11px;color:var(--tx3)}
+.cal .hot{background:var(--rdbg)}.cal .hot .amt{color:var(--rd)}
+.cal .today{box-shadow:inset 0 0 0 2.5px var(--tx)}
+@media(max-width:800px){.bond-sum,.tl-cards,.cal-cards{grid-template-columns:1fr 1fr}.tl-wrap{grid-template-columns:1fr}.bond-grid{grid-template-columns:1fr}.cal>div{min-height:64px;padding:4px}.cal .amt{font-size:11px}.cal .cnt{display:none}}
+@media print{tr.v4-cash>td{background:none}}
+#page-loans td,#page-fdr td{white-space:nowrap}
+#page-loans td input.v4-amt,#page-fdr td input.v4-amt{width:11em!important;display:inline-block}
+.v4-sym,#page-creditors span[id^="cred-sym-"],#page-liability td.r>span:first-child{font-size:16px!important;font-weight:600;color:var(--tx2)!important}
+.v4-words{font-size:12.5px;font-weight:600;color:var(--tx2);margin-top:5px;line-height:1.35;max-width:300px}
+
+</style>
 </head>
 <body>
 <script>
@@ -690,6 +777,7 @@ catch (e) { document.body.classList.add('light'); }
         <div class="nsi" id="nav-bsub-opened" onclick="navigate('banking','opened')"><span>Opened LCs</span><span class="cnt" id="cnt-opened"></span></div>
         <div class="nsi" id="nav-bsub-atbank" onclick="navigate('banking','atbank')"><span>Documents at Bank</span><span class="cnt" id="cnt-atbank"></span></div>
         <div class="nsi" id="nav-bsub-accepted" onclick="navigate('banking','accepted')"><span>Accepted Bills</span><span class="cnt" id="cnt-accepted"></span></div>
+        <div class="nsi" id="nav-bsub-calendar" onclick="navigate('banking','calendar')"><span>Maturity calendar</span></div>
         <div class="nsi" id="nav-bsub-history" onclick="navigate('banking','history')"><span>Completed Payments</span><span class="cnt" id="cnt-history"></span></div>
         <div class="nsi" id="nav-bsub-alerts" onclick="navigate('banking','alerts')"><span>Needs attention</span><span class="cnt" id="cnt-alerts"></span></div>
         <div class="nsi" id="nav-bsub-flags" onclick="navigate('banking','flags')"><span>Hold / Cancellation</span><span class="cnt" id="cnt-flags"></span></div>
@@ -733,6 +821,7 @@ catch (e) { document.body.classList.add('light'); }
     <div class="tab" data-t="pins" onclick="admTab('pins')">PINs</div>
     <div class="tab" data-t="backups" onclick="admTab('backups')">Backups</div>
     <div class="tab" data-t="rates" onclick="admTab('rates')">Rates</div>
+    <div class="tab" data-t="bond" onclick="admTab('bond')">Bond</div>
   </div>
   <div id="adm-body"></div>
 </div>
@@ -877,6 +966,7 @@ catch (e) { document.body.classList.add('light'); }
       </div>
 
       <!-- 4. History -->
+      <div class="bank-sub" id="bsub-calendar" style="display:none"><div id="cal-body"></div></div>
       <div class="bank-sub" id="bsub-history" style="display:none">
         <div class="sw">
           <div class="tabs no-print">
@@ -971,7 +1061,7 @@ catch (e) { document.body.classList.add('light'); }
               style="background:var(--bg3);border:1px solid var(--bdr);color:var(--tx);padding:8px 12px;border-radius:var(--r);font-size:13px;width:220px;outline:none;font-family:inherit">
             <div id="loan-search-dd" style="display:none;position:fixed;background:var(--bg2);border:1px solid var(--bdr2);border-radius:var(--r);z-index:9999;min-width:280px;max-height:280px;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,.3)"></div>
           </div>
-          <button class="btn bed bsm" onclick="openReviewUnchecked()" title="Loans not confirmed against this week's bank statement">Review Unchecked <span id="loan-unchecked-count" style="background:var(--am);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">0</span></button>
+          <button class="btn bed bsm" onclick="openReviewUnchecked()" title="Loans not confirmed against the latest bank statement">Review Unchecked <span id="loan-unchecked-count" style="background:var(--am);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">0</span></button>
           <button class="btn bp bsm" onclick="printAllLoans()" title="Print every loan table in one document"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:2px"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>Print All</button>
         </div>
       </div>
@@ -1045,7 +1135,7 @@ catch (e) { document.body.classList.add('light'); }
       <div class="ph">
         <div><h1>FDR</h1><p style="color:var(--tx3);font-size:12px;margin-top:4px">Fixed Deposit Receipts &#x2014; independent tracker, not synced with Cash LC, Banking, or Loans</p></div>
         <div class="no-print">
-          <button class="btn bed bsm" onclick="openReviewUncheckedFDR()" title="FDRs not confirmed against this week's bank statement">Review Unchecked <span id="fdr-unchecked-count" style="background:var(--am);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">0</span></button>
+          <button class="btn bed bsm" onclick="openReviewUncheckedFDR()" title="FDRs not confirmed against the latest bank statement">Review Unchecked <span id="fdr-unchecked-count" style="background:var(--am);color:#fff;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:4px">0</span></button>
         </div>
       </div>
 
@@ -1244,9 +1334,10 @@ catch (e) { document.body.classList.add('light'); }
 
       <div class="sw">
         <div class="tabs no-print">
-          <div class="tab active" onclick="switchTab('debit')">Debit &#x2014; L/C Entries</div>
-          <div class="tab" onclick="switchTab('credit')">Credit &#x2014; Payments</div>
-          <div class="tab" onclick="switchTab('running')">Running Balance</div>
+          <div class="tab active" data-t="debit" onclick="switchTab('debit')">Debit &#x2014; L/C Entries</div>
+          <div class="tab" data-t="credit" onclick="switchTab('credit')">Credit &#x2014; Payments</div>
+          <div class="tab" data-t="running" onclick="switchTab('running')">Running Balance</div>
+          <div class="tab" data-t="bond" id="tab-bond-btn" style="display:none" onclick="switchTab('bond')">Bond &#x2014; Import / Export weight<span id="tab-bond-cnt" style="display:none"></span></div>
         </div>
 
         <!-- DEBIT TAB -->
@@ -1307,6 +1398,7 @@ catch (e) { document.body.classList.add('light'); }
         </div>
 
         <!-- RUNNING BALANCE TAB -->
+        <div id="tab-bond" style="display:none"></div>
         <div id="tab-running" style="display:none">
           <div class="print-section-title">RUNNING BALANCE</div>
           <div class="fbar no-print">
@@ -1457,6 +1549,10 @@ catch (e) { document.body.classList.add('light'); }
         <div class="mfg"><label>Commission (BDT)</label><input type="number" id="lcomm" placeholder="0"></div>
         <div class="mfg"><label>Packages / Rolls</label><input type="number" id="lpkg" placeholder="0"></div>
       </div>
+      <div class="mr" id="bond-fields" style="display:none">
+        <div class="mfg"><label>Material</label><select id="lmat" onchange="onLCMatChange()"><option value="fabric">Fabric</option><option value="yarn">Yarn</option></select></div>
+        <div class="mfg"><label>Import weight (kg)</label><input type="number" id="lkg" placeholder="0.00" oninput="onLCMatChange()"><div id="lkg-hint" style="font-size:11px;color:var(--tx3);margin-top:4px"></div></div>
+      </div>
       <div class="mfg"><label>Notes / Remarks (optional)</label><input type="text" id="lnotes" placeholder="e.g. Amendment, special condition..."></div>
     </div>
     <div class="mft"><button class="btn bg" onclick="cm('m-lc')">Cancel</button><button class="btn bp" id="lc-save-btn">Add to Ledger</button></div>
@@ -1564,7 +1660,7 @@ async function doLogin() {
   }
   err.textContent = '';
   try { localStorage.setItem('fin_last_user', uid); } catch (e) {}
-  AUTH = { token: r.token, user: r.user, exp: Math.min(r.exp, Date.now() + SESSION_MS) };
+  AUTH = { token: r.token, user: r.user, exp: r.exp, refreshToken: r.refreshToken || '' };
   saveAuth();
   document.getElementById('pw-input').value = '';
   document.getElementById('login-screen').classList.add('hidden');
@@ -1748,7 +1844,7 @@ var _mutationSeq = 0, _inflightMutations = 0;
 // The app speaks camelCase with '' for "empty"; the database uses snake_case with real nulls.
 var SBC = (function () {
   'use strict';
-  var TABLES = {"bank_lcs":[["id","id","t"],["company","company","t"],["date","date","d"],["lcNo","lc_no","t"],["type","type","t"],["buyerName","buyer_name","t"],["expiryDate","expiry_date","d"],["usd","usd","n"],["bdt","bdt","n"],["remarks","remarks","t"],["isCash","is_cash","t"],["cashPartyId","cash_party_id","t"],["cashPartyType","cash_party_type","t"],["acceptedUSD","accepted_usd","n"],["status","status","t"],["supplier","supplier","t"],["closed","closed","t"],["closedDate","closed_date","d"],["version","version","i"],["flag","flag","t"],["flagDate","flag_date","d"],["flagNote","flag_note","t"],["flagHistory","flag_history","t"],["stop","stop","t"],["stopDate","stop_date","d"],["stopNote","stop_note","t"],["stopBy","stop_by","t"],["stopHistory","stop_history","t"]],"lc_docs":[["id","id","t"],["bankLcId","bank_lc_id","t"],["lcNo","lc_no","t"],["usd","usd","n"],["status","status","t"],["arrivedDate","arrived_date","d"],["acceptedDate","accepted_date","d"],["maturityDate","maturity_date","d"],["paidDate","paid_date","d"],["remarks","remarks","t"],["dupOk","dup_ok","t"],["createdAt","created_at","t"],["stop","stop","t"],["stopDate","stop_date","d"],["stopNote","stop_note","t"],["stopBy","stop_by","t"],["stopFrom","stop_from","t"],["stopHistory","stop_history","t"]],"parties":[["id","id","t"],["name","name","t"],["prevBalance","prev_balance","n"],["startDate","start_date","d"],["customTypes","custom_types","t"],["ptype","ptype","t"]],"debits":[["id","id","t"],["partyId","party_id","t"],["date","date","d"],["lc","lc","t"],["company","company","t"],["usd","usd","n"],["rate","rate","n"],["bdt","bdt","n"],["doc","doc","t"],["accept","accept","t"],["payment","payment","t"],["notes","notes","t"],["commission","commission","n"],["packages","packages","n"],["deliveries","deliveries","t"],["bankCompany","bank_company","t"],["bankLcId","bank_lc_id","t"],["ud","ud","t"]],"credits":[["id","id","t"],["partyId","party_id","t"],["date","date","d"],["type","type","t"],["amt","amt","n"],["remarks","remarks","t"]],"loans":[["id","id","t"],["company","company","t"],["loanType","loan_type","t"],["accountNo","account_no","t"],["amount","amount","n"],["installment","installment","n"],["lastVerified","last_verified","t"]],"loans_machine":[["id","id","t"],["accountNo","account_no","t"],["machineType","machine_type","t"],["usd","usd","n"],["rate","rate","n"],["bdt","bdt","n"],["maturityDate","maturity_date","d"]],"fdr":[["id","id","t"],["entity","entity","t"],["entityType","entity_type","t"],["bank","bank","t"],["accountNo","account_no","t"],["amount","amount","n"],["lastVerified","last_verified","t"]],"creditors":[["id","id","t"],["category","category","t"],["name","name","t"],["currency","currency","t"],["amount","amount","n"],["bdtAmount","bdt_amount","n"],["notes","notes","t"],["quantity","quantity","n"],["unit","unit","t"],["rate","rate","n"]],"creditor_settings":[["currency","currency","t"],["rate","rate","n"]],"liabilities":[["id","id","t"],["name","name","t"],["currency","currency","t"],["usdAmount","usd_amount","n"],["bdtAmount","bdt_amount","n"]],"locker_log":[["id","id","t"],["lockerType","locker_type","t"],["txType","tx_type","t"],["amount","amount","n"],["currency","currency","t"],["date","date","d"],["balanceAfter","balance_after","n"],["creditorItemId","creditor_item_id","t"]],"bank_settings":[["key","key","t"],["value","value","n"]],"loan_settings":[["key","key","t"],["value","value","n"]],"module_activity":[["module","module","t"],["lastUpdated","last_updated","t"]],"oplog":[["opId","op_id","t"],["at","at","ts"],["type","type","t"],["result","result","t"]],"audit":[["timestamp","ts","ts"],["action","action","t"],["description","description","t"]]};
+  var TABLES = {"bank_lcs":[["id","id","t"],["company","company","t"],["date","date","d"],["lcNo","lc_no","t"],["type","type","t"],["buyerName","buyer_name","t"],["expiryDate","expiry_date","d"],["usd","usd","n"],["bdt","bdt","n"],["remarks","remarks","t"],["isCash","is_cash","t"],["cashPartyId","cash_party_id","t"],["cashPartyType","cash_party_type","t"],["acceptedUSD","accepted_usd","n"],["status","status","t"],["supplier","supplier","t"],["closed","closed","t"],["closedDate","closed_date","d"],["version","version","i"],["flag","flag","t"],["flagDate","flag_date","d"],["flagNote","flag_note","t"],["flagHistory","flag_history","t"],["stop","stop","t"],["stopDate","stop_date","d"],["stopNote","stop_note","t"],["stopBy","stop_by","t"],["stopHistory","stop_history","t"]],"lc_docs":[["id","id","t"],["bankLcId","bank_lc_id","t"],["lcNo","lc_no","t"],["usd","usd","n"],["status","status","t"],["arrivedDate","arrived_date","d"],["acceptedDate","accepted_date","d"],["maturityDate","maturity_date","d"],["paidDate","paid_date","d"],["remarks","remarks","t"],["dupOk","dup_ok","t"],["createdAt","created_at","t"],["stop","stop","t"],["stopDate","stop_date","d"],["stopNote","stop_note","t"],["stopBy","stop_by","t"],["stopFrom","stop_from","t"],["stopHistory","stop_history","t"]],"parties":[["id","id","t"],["name","name","t"],["prevBalance","prev_balance","n"],["startDate","start_date","d"],["customTypes","custom_types","t"],["ptype","ptype","t"]],"debits":[["id","id","t"],["partyId","party_id","t"],["date","date","d"],["lc","lc","t"],["company","company","t"],["usd","usd","n"],["rate","rate","n"],["bdt","bdt","n"],["doc","doc","t"],["accept","accept","t"],["payment","payment","t"],["notes","notes","t"],["commission","commission","n"],["packages","packages","n"],["deliveries","deliveries","t"],["bankCompany","bank_company","t"],["bankLcId","bank_lc_id","t"],["ud","ud","t"],["material","material","t"],["importKg","import_kg","n"],["exports","exports","t"]],"credits":[["id","id","t"],["partyId","party_id","t"],["date","date","d"],["type","type","t"],["amt","amt","n"],["remarks","remarks","t"]],"loans":[["id","id","t"],["company","company","t"],["loanType","loan_type","t"],["accountNo","account_no","t"],["amount","amount","n"],["installment","installment","n"],["lastVerified","last_verified","t"]],"loans_machine":[["id","id","t"],["accountNo","account_no","t"],["machineType","machine_type","t"],["usd","usd","n"],["rate","rate","n"],["bdt","bdt","n"],["maturityDate","maturity_date","d"]],"fdr":[["id","id","t"],["entity","entity","t"],["entityType","entity_type","t"],["bank","bank","t"],["accountNo","account_no","t"],["amount","amount","n"],["lastVerified","last_verified","t"]],"creditors":[["id","id","t"],["category","category","t"],["name","name","t"],["currency","currency","t"],["amount","amount","n"],["bdtAmount","bdt_amount","n"],["notes","notes","t"],["quantity","quantity","n"],["unit","unit","t"],["rate","rate","n"]],"creditor_settings":[["currency","currency","t"],["rate","rate","n"]],"liabilities":[["id","id","t"],["name","name","t"],["currency","currency","t"],["usdAmount","usd_amount","n"],["bdtAmount","bdt_amount","n"]],"locker_log":[["id","id","t"],["lockerType","locker_type","t"],["txType","tx_type","t"],["amount","amount","n"],["currency","currency","t"],["date","date","d"],["balanceAfter","balance_after","n"],["creditorItemId","creditor_item_id","t"]],"bank_settings":[["key","key","t"],["value","value","n"]],"loan_settings":[["key","key","t"],["value","value","n"]],"module_activity":[["module","module","t"],["lastUpdated","last_updated","t"]],"oplog":[["opId","op_id","t"],["at","at","ts"],["type","type","t"],["result","result","t"]],"audit":[["timestamp","ts","ts"],["action","action","t"],["description","description","t"]]};
   function conv(kind, v) {
     if (kind === 't') return v == null ? '' : String(v);
     if (v === '' || v == null) return null;
@@ -1842,7 +1938,7 @@ var SB = (function () {
   var CASH_WRITES = { saveParty: 1, saveCredit: 1, editCredit: 1, deleteCredit: 1, updateDebit: 1, saveTypes: 1 };
   var LEGACY_LC = { saveDebit: 1, editDebit: 1, deleteDebit: 1, saveBankLC: 1, editBankLC: 1, deleteBankLC: 1, saveAcceptance: 1, makePayment: 1, undoPayment: 1, deleteAcceptance: 1, saveBankSettings: 1, getBankData: 1, load: 1, loadAll: 1, forceSync: 1 };
   var CONVERSION = { conversionPreview: 1, convertNow: 1, rollbackConversion: 1 };
-  var COMMERCIAL_OK = { loadFinance: 1, lcOp: 1, logout: 1, changePassword: 1, logAudit: 1, whoami: 1, loginUsers: 1, login: 1 };
+  var COMMERCIAL_OK = { refreshSession: 1, loadFinance: 1, lcOp: 1, logout: 1, changePassword: 1, logAudit: 1, whoami: 1, loginUsers: 1, login: 1 };
   var EDGE = { lcOp: 1, refreshMirrors: 1, listUsers: 1, saveUser: 1, deleteUser: 1 };
   var ROLE_NAMES = { admin: 'Admin', md: 'Management', commercial: 'Commercial' };
 
@@ -1895,9 +1991,15 @@ var SB = (function () {
         cfg.getToken = keep;
         var prof = p.ok && p.data && p.data[0];
         if (!prof || !prof.active) return { error: 'Incorrect name or password.', code: 'BAD_LOGIN' };
-        return { ok: true, token: tok, exp: Date.now() + (Number(t.data.expires_in) || 3600) * 1000,
+        return { ok: true, token: tok, refreshToken: t.data.refresh_token || '', exp: Date.now() + (Number(t.data.expires_in) || 3600) * 1000,
           user: { id: uid, email: email, name: prof.name, role: prof.role, roleName: ROLE_NAMES[prof.role] || prof.role, active: true, lastLogin: '' } };
       }
+      case 'refreshSession': {
+        var rt = await http('POST', '/auth/v1/token?grant_type=refresh_token', { body: { refresh_token: String(b.refreshToken || '') }, anon: true });
+        if (!rt.ok || !rt.data || !rt.data.access_token) return { error: 'Please log in again.', code: 'AUTH' };
+        return { ok: true, token: rt.data.access_token, refreshToken: rt.data.refresh_token || '', exp: Date.now() + (Number(rt.data.expires_in) || 3600) * 1000 };
+      }
+      case 'saveBondWastage': { x = await rpc('set_bond_wastage', { p: b.rates || {} }); return x.ok ? x.data : x.err; }
       case 'logout': { await http('POST', '/auth/v1/logout', {}); return { ok: true }; }
       case 'whoami': return { ok: true };
       case 'changePassword': return { error: 'Passwords are changed by the Admin (Admin panel, Users).' };
@@ -1930,9 +2032,6 @@ var SB = (function () {
       case 'pinsInfo': { x = await rpc('pins_info'); return x.ok ? x.data : x.err; }
       case 'backupSchedule': { x = await rpc('backup_schedule'); return x.ok ? x.data : x.err; }
       case 'setPin': {
-        // the Admin confirms with his own password first
-        var chk2 = await http('POST', '/auth/v1/token?grant_type=password', { body: { email: cfg.getEmail(), password: String(b.password || '') }, anon: true });
-        if (!chk2.ok) return { error: 'Your password is not correct.' };
         x = await rpc('set_pin', { p_kind: String(b.kind || ''), p_new: String(b.pin || '') });
         if (!x.ok) return x.err;
         return x.data && x.data.error ? { error: x.data.error } : { ok: true };
@@ -2578,7 +2677,7 @@ function rDT(){
       ? FD(matInfo.date) + (matInfo.extra > 0 ? ' <span style="font-size:9px;color:var(--tx3)">(+'+matInfo.extra+' more)</span>' : '')
       : '<span style="color:var(--tx3)">\u2014</span>';
     const actions = '<td class="no-print" style="white-space:nowrap"><button class="btn bed bsm" onclick="openEditLC(\''+jsq(r.id)+'\')" style="margin-right:4px">Edit</button><button class="btn bdg bsm" onclick="delLC(\''+jsq(r.id)+'\')">\u2715</button></td>';
-    const lcCell = '<td class="mn" style="font-weight:700;font-size:13px;color:var(--tx)">'+esc(r.lc)+flagChip(r.bankLcId)+'</td><td style="font-weight:700">'+esc(r.company||'\u2014')+'</td>';
+    const lcCell = '<td class="mn'+(r.bankLcId?' v4-lclink':'')+'" style="font-weight:700;font-size:13px;color:var(--tx)"'+(r.bankLcId?' onclick="openLcTimeline(\''+jsq(r.bankLcId)+'\')" title="Show everything that happened to this LC"':'')+'>'+esc(r.lc)+(isFab&&r.material==='yarn'?' <span class="chip n">Yarn</span>':'')+flagChip(r.bankLcId)+'</td><td style="font-weight:700">'+esc(r.company||'\u2014')+'</td>';
     if(isFab){
       const comm = NUM(r.commission);
       const total = NUM(r.bdt) + comm;
@@ -2768,6 +2867,7 @@ function openEditLC(id){
   // ── Edit mode shows Party + Type instead of the simple Ledger dropdown ──
   document.getElementById('lc-ledger-row').style.display = 'none';
   document.getElementById('lc-edit-party-row').style.display = 'flex';
+  document.getElementById('bond-fields').style.display = 'none';
   const _curParty = ST.parties.find(x => x.id === d.partyId);
   document.getElementById('le-party-name').value = _curParty ? _curParty.name : '';
   refreshEditPartyTypeOptions(_curParty ? _curParty.name : '', _curParty ? _curParty.ptype : 'accessories');
@@ -3315,6 +3415,8 @@ function onLCLedgerChange(){
   var targetId = sel.value;
   var target = _lcLedgerOptions.find(function(p){ return p.id === targetId; });
   document.getElementById('fabric-fields').style.display = (target && target.ptype === 'fabric') ? 'flex' : 'none';
+  document.getElementById('bond-fields').style.display = (target && target.ptype === 'fabric') ? 'flex' : 'none';
+  document.getElementById('lmat').value = 'fabric'; document.getElementById('lkg').value = ''; onLCMatChange();
   if (!target || target.ptype !== 'fabric') {
     document.getElementById('lcomm').value = '';
     document.getElementById('lpkg').value = '';
@@ -3363,7 +3465,7 @@ async function svLC(){
   const op = { type:'openLC',
     lc: { id: newId('lc'), date: d, lcNo: lc, supplier: co, usd: u, company: bankCo, bdt: b + comm, remarks: notes, type:'', buyerName:'', expiryDate:'' },
     debit: { id: newId('db'), partyId: p.id, rate: r, bdt: b, commission: comm, packages: pkg, notes: notes } };
-  if (await runLc(op)) addAudit('add', 'Added LC ' + esc(lc) + ' for ' + esc(co||'\u2014') + ' \u2014 ' + F(b) + ' (' + (isFabricTarget?'Fabric':'Accessories') + ' ledger)');
+  if (await runLc(op) && !bondAfterAdd(op.debit.id, isFabricTarget)) addAudit('add', 'Added LC ' + esc(lc) + ' for ' + esc(co||'\u2014') + ' \u2014 ' + F(b) + ' (' + (isFabricTarget?'Fabric':'Accessories') + ' ledger)');
 }
 
 
@@ -3677,7 +3779,7 @@ function doPrint(){
     : [p];
 
   function inRange(dt){var d=String(dt).split('T')[0];if(from&&d<from)return false;if(to&&d>to)return false;return true;}
-  function TK(n){return '\u09F3'+Math.abs(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function TK(n){return '\u09F3'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
   // Balance with a "Cr" marker when the party is in credit (paid in advance).
   // Previously a negative balance printed exactly like an amount owed.
   function TKB(n){return TK(n)+(n< -0.005?' Cr':'');}
@@ -4677,6 +4779,7 @@ var BANK_SUBS = {
   opened:   ['Opened LCs', 'Banking \u00b7 LCs waiting for their documents'],
   atbank:   ['Documents at Bank', 'Banking \u00b7 documents arrived, acceptance not given yet'],
   accepted: ['Accepted Bills', 'Banking \u00b7 accepted, awaiting payment (company liability)'],
+  calendar: ['Maturity calendar', 'Banking \u00b7 accepted bills by the day the bank must be paid'],
   history:  ['Completed Payments', 'Banking \u00b7 paid documents and closed LCs'],
   alerts:   ['Needs attention', 'Banking \u00b7 LCs left waiting too long'],
   flags:    ['Hold / Cancellation', 'Banking \u00b7 acceptance hold or cancellation applied for, until resolved'],
@@ -4689,7 +4792,7 @@ function renderBankingPage() {
   if (!FIN.idx) return;
   document.getElementById('bank-title').textContent = BANK_SUBS[BANK.sub][0];
   document.getElementById('bank-sub').textContent = BANK_SUBS[BANK.sub][1];
-  ['opened', 'atbank', 'accepted', 'history', 'alerts', 'flags'].forEach(function(k){
+  ['opened', 'atbank', 'accepted', 'calendar', 'history', 'alerts', 'flags'].forEach(function(k){
     document.getElementById('bsub-' + k).style.display = k === BANK.sub ? '' : 'none';
     var n = document.getElementById('nav-bsub-' + k); if (n) n.classList.toggle('active', k === BANK.sub && document.getElementById('page-banking').classList.contains('active'));
   });
@@ -4699,6 +4802,7 @@ function renderBankingPage() {
   else if (BANK.sub === 'accepted') renderAcceptedBills();
   else if (BANK.sub === 'alerts') renderAlerts();
   else if (BANK.sub === 'flags') renderFlags();
+  else if (BANK.sub === 'calendar') renderCalendar();
   else renderHistory();
   renderBankNavCounts();
 }
@@ -5582,7 +5686,7 @@ function printBanking() {
   var printName = both ? GROUP_PRINT_NAME : (COMPANY_PRINT_NAMES[co] || GROUP_PRINT_NAME);
   var rate = bRate(), today = todayISO();
   function FDP(d){ if (!d) return '\u2014'; var p = String(d).split('T')[0].split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0].slice(2) : esc(d); }
-  function TKp(c){ return '\u09f3' + (c / 100 * rate).toLocaleString('en-IN', { maximumFractionDigits: 0 }); }
+  function TKp(c){ return '\u09f3' + (c / 100 * rate).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
   function inCo(lcId){ var l = lcOf(lcId); return both || (l && l.company === co); }
   var coTh = both ? '<th>Company</th>' : '', ptTh = showParty ? '<th>Party</th>' : '';
   function coTd(l){ return both ? '<td class="l">' + esc((l && l.company) || '\u2014') + '</td>' : ''; }
@@ -6247,12 +6351,12 @@ function isVerifiedThisWeek(loan) {
   if (!loan.lastVerified) return false;
   var last = new Date(loan.lastVerified).getTime();
   if (isNaN(last)) return false;
-  return (Date.now() - last) < 7 * 24 * 60 * 60 * 1000;
+  return (Date.now() - last) < 2 * 24 * 60 * 60 * 1000;
 }
 function verifiedTag(loan) {
   return isVerifiedThisWeek(loan)
-    ? '<span style="font-size:9px;padding:1px 6px;background:rgba(76,175,130,.12);color:var(--gr);border-radius:10px;font-weight:600;white-space:nowrap">\u2713 Checked this week</span>'
-    : '<span style="font-size:9px;padding:1px 6px;background:rgba(201,154,72,.12);color:var(--am);border-radius:10px;font-weight:600;white-space:nowrap">Not checked this week</span>';
+    ? '<span style="font-size:9px;padding:1px 6px;background:rgba(76,175,130,.12);color:var(--gr);border-radius:10px;font-weight:600;white-space:nowrap">\u2713 Checked</span>'
+    : '<span style="font-size:9px;padding:1px 6px;background:rgba(201,154,72,.12);color:var(--am);border-radius:10px;font-weight:600;white-space:nowrap">Not checked for 2+ days</span>';
 }
 async function verifyLoan(id) {
   var loan = LOANS.loans.find(function(l){ return l.id === id; });
@@ -6287,7 +6391,7 @@ function renderReviewUncheckedList() {
   if (!list) return;
   var unchecked = getUncheckedLoans();
   if (!unchecked.length) {
-    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:13px">Everything\'s been checked this week \u2014 nothing left to review.</div>';
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:13px">Everything has been checked in the last 2 days \u2014 nothing left to review.</div>';
     return;
   }
   list.innerHTML = unchecked.map(function(l){
@@ -6337,7 +6441,7 @@ function renderMainLoanTableHTML(c) {
         + 'style="width:100%;background:transparent;border:1px solid transparent;color:var(--tx2);padding:5px 6px;border-radius:6px;font-size:13px;outline:none;font-family:var(--numf,\'DM Mono\',monospace)" '
         + 'onfocus="this.style.background=\'var(--bg3)\';this.style.borderColor=\'var(--bdr2)\'" '
         + 'onblur="this.style.background=\'transparent\';this.style.borderColor=\'transparent\'"></td>'
-      + '<td class="no-print" style="white-space:nowrap"><button class="btn bg bsm" onclick="verifyLoan(\'' + l.id + '\')" title="Confirm this matches this week\'s bank statement" style="margin-right:4px">&#10003; Verify</button><button class="btn bp bsm" onclick="payLoanFull(\'' + l.id + '\')">Pay Full</button></td>'
+      + '<td class="no-print" style="white-space:nowrap"><button class="btn bg bsm" onclick="verifyLoan(\'' + l.id + '\')" title="Confirm this matches the latest bank statement" style="margin-right:4px">&#10003; Verify</button><button class="btn bp bsm" onclick="payLoanFull(\'' + l.id + '\')">Pay Full</button></td>'
       + '</tr>';
   }).join('');
 
@@ -6438,7 +6542,7 @@ function renderLoanTableHTML(type, c) {
         + 'onfocus="this.style.background=\'var(--bg3)\';this.style.borderColor=\'var(--bdr2)\'" '
         + 'onblur="this.style.background=\'transparent\';this.style.borderColor=\'transparent\'"></td>'
       + '<td class="no-print" style="white-space:nowrap">'
-      + '<button class="btn bg bsm" onclick="verifyLoan(\'' + l.id + '\')" title="Confirm this matches this week\'s bank statement" style="margin-right:4px">&#10003; Verify</button>'
+      + '<button class="btn bg bsm" onclick="verifyLoan(\'' + l.id + '\')" title="Confirm this matches the latest bank statement" style="margin-right:4px">&#10003; Verify</button>'
       + '<button class="btn bp bsm" onclick="payLoanFull(\'' + l.id + '\')">Pay Full</button>'
       + '</td>'
       + '</tr>';
@@ -7043,7 +7147,7 @@ function renderFDRDetail() {
           + 'style="width:150px;text-align:right;background:transparent;border:1px solid transparent;font-family:var(--numf,\'DM Mono\',monospace);font-weight:600;font-size:13px;color:var(--tx);padding:5px 8px;border-radius:6px;outline:none" '
           + 'onfocus="this.style.background=\'var(--bg3)\';this.style.borderColor=\'var(--bdr2)\'" '
           + 'onblur="this.style.background=\'transparent\';this.style.borderColor=\'transparent\'"></td>'
-        + '<td class="no-print" style="white-space:nowrap"><button class="btn bg bsm" onclick="verifyFDR(\'' + f.id + '\')" title="Confirm this matches this week\'s bank statement" style="margin-right:4px">&#10003; Verify</button><button class="btn bdg bsm" onclick="closeFDRRow(\'' + f.id + '\')">Closed</button></td>'
+        + '<td class="no-print" style="white-space:nowrap"><button class="btn bg bsm" onclick="verifyFDR(\'' + f.id + '\')" title="Confirm this matches the latest bank statement" style="margin-right:4px">&#10003; Verify</button><button class="btn bdg bsm" onclick="closeFDRRow(\'' + f.id + '\')">Closed</button></td>'
         + '</tr>';
     }).join('');
   }
@@ -7166,7 +7270,7 @@ function renderReviewUncheckedFDRList() {
   if (!list) return;
   var unchecked = getUncheckedFDRs();
   if (!unchecked.length) {
-    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:13px">Everything\'s been checked this week \u2014 nothing left to review.</div>';
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--tx3);font-size:13px">Everything has been checked in the last 2 days \u2014 nothing left to review.</div>';
     return;
   }
   list.innerHTML = unchecked.map(function(f){
@@ -7365,7 +7469,7 @@ function creditorRate(code) {
   return NUM(CREDITORS.rates[code]) || 0;
 }
 function fmtCreditorBDT(n) {
-  return '\u09F3' + NUM(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return '\u09F3' + NUM(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 // ── Accounting-style number formatting for EDITABLE input fields ──
@@ -8585,6 +8689,7 @@ async function admRender() {
     else if (ADM.tab === 'pins') await admPins();
     else if (ADM.tab === 'backups') await admBackups();
     else if (ADM.tab === 'rates') await admRates();
+    else if (ADM.tab === 'bond') await admBond();
   } catch (e) { b.innerHTML = '<div class="adm-warn">' + esc(e.message || 'Could not load.') + '</div>'; }
 }
 
@@ -8732,12 +8837,11 @@ async function admPins() {
 function admPinChange(kind) {
   admOpen('Change ' + (kind === 'cash' ? 'Cash LC PIN' : 'Action PIN'), '<div class="mfg"><label>New PIN (4 to 8 digits)</label><input type="password" id="ap-new" inputmode="numeric" maxlength="8" autocomplete="off"' + ADM_ENTER + '></div>'
     + '<div class="mfg"><label>New PIN again</label><input type="password" id="ap-new2" inputmode="numeric" maxlength="8" autocomplete="off"' + ADM_ENTER + '></div>'
-    + '<div class="mfg"><label>Your Admin password</label><input type="password" id="ap-pw" autocomplete="current-password"' + ADM_ENTER + '></div>', 'Change PIN', async function () {
-    var a = $$('ap-new').value, b = $$('ap-new2').value, pw = $$('ap-pw').value;
+    , 'Change PIN', async function () {
+    var a = $$('ap-new').value, b = $$('ap-new2').value;
     if (!/^\d{4,8}$/.test(a)) { showAlert('The PIN must be 4 to 8 digits.'); return; }
     if (a !== b) { showAlert('The two PINs are not the same.'); return; }
-    if (!pw) { showAlert('Enter your Admin password.'); return; }
-    try { await api('setPin', { kind: kind, pin: a, password: pw }); cm('m-adm'); showSync('ok', 'PIN changed'); admPins(); }
+    try { await api('setPin', { kind: kind, pin: a }); cm('m-adm'); showSync('ok', 'PIN changed'); admPins(); }
     catch (e) { showAlert(e.message, 'Not changed'); }
   });
 }
@@ -8965,6 +9069,674 @@ initApp = async function () {
   await _initApp0();
   setTimeout(function () { dailyRates(); }, 3000);
 };
+
+// ═══ SECTION: release 4 \u2014 stay signed in, amounts, module edit, bond, LC timeline, maturity calendar ═══
+
+// ── 1. Stay signed in: the login is kept on this device and renewed quietly ──
+function saveAuth() { if (typeof _v4Out !== 'undefined' && _v4Out) return; try { localStorage.setItem(SK_AUTH, JSON.stringify(AUTH)); } catch (e) {} }
+function loadAuth() {
+  try {
+    var a = JSON.parse(localStorage.getItem(SK_AUTH) || 'null');
+    if (a && a.token && a.user && (a.exp > Date.now() || a.refreshToken)) { AUTH = a; return true; }
+  } catch (e) {}
+  return false;
+}
+function startTimer(exp) { sessionEnd = exp; clearInterval(sessionTimer); var b = document.getElementById('session-bar'); if (b) b.style.display = 'none'; }
+var _v4LogoutBase = doLogout, _v4Out = false;
+doLogout = function (message) {
+  _v4Out = true;
+  try { localStorage.removeItem(SK_AUTH); } catch (e) {}
+  return _v4LogoutBase(message);
+};
+var _v4Refreshing = null;
+async function v4EnsureFresh() {
+  if (!AUTH || !AUTH.token || _v4Out) return;
+  if (AUTH.exp - Date.now() > 120000) return;
+  // another tab may have renewed it already
+  try { var a = JSON.parse(localStorage.getItem(SK_AUTH) || 'null'); if (a && a.user && AUTH.user && a.user.id === AUTH.user.id && a.exp - Date.now() > 120000) { AUTH = a; return; } } catch (e) {}
+  if (!AUTH.refreshToken) return;
+  if (!_v4Refreshing) _v4Refreshing = (async function () {
+    try {
+      var r = await _v4Call('refreshSession', { refreshToken: AUTH.refreshToken });
+      if (r && r.ok) { AUTH.token = r.token; AUTH.exp = r.exp; if (r.refreshToken) AUTH.refreshToken = r.refreshToken; saveAuth(); }
+    } catch (e) {}
+    finally { _v4Refreshing = null; }
+  })();
+  await _v4Refreshing;
+}
+var _v4Call = SB.call;
+SB.call = async function (action, body) {
+  if (action !== 'login' && action !== 'loginUsers' && action !== 'refreshSession' && action !== 'logout') await v4EnsureFresh();
+  return _v4Call(action, body);
+};
+var _v4Pin = SB.verifyPin;
+SB.verifyPin = async function (k, p) { await v4EnsureFresh(); return _v4Pin(k, p); };
+setInterval(function () { if (AUTH && AUTH.token && AUTH.exp - Date.now() < 300000) v4EnsureFresh(); }, 60000);
+
+// ── 2. Amount boxes show commas while you type; the code still reads plain numbers ──
+var _v4Desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+function v4Group(s) {
+  s = String(s == null ? '' : s).replace(/,/g, '').trim();
+  if (!/^-?\d*\.?\d*$/.test(s) || s === '' || s === '-' ) return s;
+  var neg = s.charAt(0) === '-'; if (neg) s = s.slice(1);
+  var p = s.split('.'), ip = p[0].replace(/^0+(?=\d)/, '');
+  ip = ip.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + ip + (p.length > 1 ? '.' + p[1] : '');
+}
+function v4AmountInput(el) {
+  if (el._v4amt) return;
+  el._v4amt = true;
+  var start = _v4Desc.get.call(el);
+  el.type = 'text';
+  el.setAttribute('inputmode', 'decimal');
+  el.setAttribute('autocomplete', 'off');
+  el.classList.add('v4-amt');
+  Object.defineProperty(el, 'value', {
+    configurable: true,
+    get: function () { return _v4Desc.get.call(this).replace(/,/g, ''); },
+    set: function (v) { _v4Desc.set.call(this, v4Group(v)); }
+  });
+  _v4Desc.set.call(el, v4Group(start));
+  el.addEventListener('input', function () {
+    var raw = _v4Desc.get.call(el), pos = el.selectionStart == null ? raw.length : el.selectionStart;
+    var before = raw.slice(0, pos).replace(/[^0-9.\-]/g, '').length;
+    var clean = raw.replace(/[^0-9.\-]/g, '');
+    var dot = clean.indexOf('.'); if (dot >= 0) clean = clean.slice(0, dot + 1) + clean.slice(dot + 1).replace(/\./g, '');
+    clean = clean.replace(/(?!^)-/g, '');
+    var f = v4Group(clean);
+    if (f !== raw) {
+      _v4Desc.set.call(el, f);
+      var i = 0, n = 0; while (i < f.length && n < before) { if (/[0-9.\-]/.test(f.charAt(i))) n++; i++; }
+      try { el.setSelectionRange(i, i); } catch (e) {}
+    }
+  });
+}
+function v4ScanAmounts(root) {
+  (root || document).querySelectorAll('input[type="number"]').forEach(v4AmountInput);
+}
+new MutationObserver(function (ms) {
+  for (var i = 0; i < ms.length; i++) for (var j = 0; j < ms[i].addedNodes.length; j++) {
+    var n = ms[i].addedNodes[j];
+    if (n.nodeType !== 1) continue;
+    if (n.tagName === 'INPUT' && n.type === 'number') v4AmountInput(n); else if (n.querySelector) v4ScanAmounts(n);
+  }
+}).observe(document.documentElement, { childList: true, subtree: true });
+v4ScanAmounts(document);
+
+// ── small modal used by this release (Enter = the main button) ──
+var V4 = { go: null };
+function v4Open(title, html, goLabel, goFn, wide) {
+  document.getElementById('v4-m-title').textContent = title;
+  document.getElementById('v4-m-body').innerHTML = html;
+  var g = document.getElementById('v4-m-go');
+  g.textContent = goLabel || 'Save'; g.style.display = goFn ? '' : 'none';
+  document.getElementById('v4-m-box').style.width = wide ? 'min(1100px, 96vw)' : 'min(560px, 96vw)';
+  V4.go = goFn;
+  om('m-v4');
+  setTimeout(function () { var i = document.querySelector('#v4-m-body input:not([type=hidden]),#v4-m-body select'); if (i && !wide) i.focus(); }, 120);
+}
+async function v4Go() { if (V4.go) await V4.go(); }
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' || e.defaultPrevented) return;
+  var m = document.getElementById('m-v4');
+  if (!m || !m.classList.contains('open') || !m.contains(e.target)) return;
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') return;
+  if (!V4.go) return;
+  e.preventDefault(); document.getElementById('v4-m-go').click();
+});
+function v4Fld(label, id, val, opts) {
+  opts = opts || {};
+  return '<div class="mfg"><label>' + label + '</label><input type="' + (opts.num ? 'number' : 'text') + '" id="' + id + '" value="' + esc(val == null ? '' : String(val)) + '"' + (opts.ph ? ' placeholder="' + esc(opts.ph) + '"' : '') + '></div>';
+}
+
+// ── 3. Loans, FDR, Creditors, Liability: an Edit button on every row ──
+var V4_MOD_PAGES = ['page-loans', 'page-fdr', 'page-creditors', 'page-liability'];
+function v4FindRec(id) {
+  var l = LOANS.loans.find(function (x) { return x.id === id; }); if (l) return { kind: 'loan', r: l };
+  var m = (LOANS.machineLoans || []).find(function (x) { return x.id === id; }); if (m) return { kind: 'machine', r: m };
+  var f = FDR.fdrs.find(function (x) { return x.id === id; }); if (f) return { kind: 'fdr', r: f };
+  var c = CREDITORS.items.find(function (x) { return x.id === id; }); if (c) return { kind: 'creditor', r: c };
+  var y = LIABILITY.items.find(function (x) { return x.id === id; }); if (y) return { kind: 'liability', r: y };
+  return null;
+}
+function v4DecorateModules() {
+  V4_MOD_PAGES.forEach(function (pid) {
+    var pg = document.getElementById(pid); if (!pg) return;
+    pg.querySelectorAll('tr[id^="loanrow-"]').forEach(function (tr) {
+      var id = tr.id.slice(8);
+      if (!tr.querySelector('.v4-edit') && !isCom()) {
+        var td = tr.lastElementChild;
+        if (td && v4FindRec(id)) {
+          var b = document.createElement('button');
+          b.className = 'btn bed bsm v4-edit no-print'; b.textContent = 'Edit'; b.style.marginRight = '4px';
+          b.setAttribute('onclick', "v4EditRow('" + jsq(id) + "')");
+          td.insertBefore(b, td.firstChild);
+        }
+      }
+      // a taka sign before plain amount boxes
+      tr.querySelectorAll('input').forEach(function (inp) {
+        var oc = inp.getAttribute('onchange') || '';
+        if (!/'(amount|installment|bdtAmount)'|updateFDRAmount/.test(oc)) return;
+        var prev = inp.previousElementSibling;
+        if (prev && (prev.classList.contains('v4-sym') || /^cred-sym-/.test(prev.id || '') || /^[\u09f3$]/.test((prev.textContent || '').trim()))) return;
+        var s = document.createElement('span'); s.className = 'v4-sym'; s.textContent = '\u09f3';
+        inp.parentNode.insertBefore(s, inp);
+      });
+    });
+  });
+}
+var _v4ModObs = new MutationObserver(function () { clearTimeout(_v4ModObs.t); _v4ModObs.t = setTimeout(v4DecorateModules, 0); });
+V4_MOD_PAGES.forEach(function (pid) { var p = document.getElementById(pid); if (p) _v4ModObs.observe(p, { childList: true, subtree: true }); });
+
+function v4EditRow(id) {
+  var x = v4FindRec(id); if (!x) return;
+  var r = x.r, html = '', title = 'Edit', save;
+  if (x.kind === 'loan') {
+    title = 'Edit loan \u2014 ' + (r.accountNo || '');
+    html = v4Fld('Account no.', 'v4e-acc', r.accountNo) + v4Fld('Amount (BDT)', 'v4e-amt', NUM(r.amount), { num: 1 })
+      + ((r.loanType === 'hbl' || r.loanType === 'term') ? v4Fld('Installment (BDT)', 'v4e-inst', r.installment === '' || r.installment == null ? '' : NUM(r.installment), { num: 1 }) : '');
+    save = async function () {
+      var acc = document.getElementById('v4e-acc').value.trim(), amt = document.getElementById('v4e-amt').value;
+      if (!acc) { showAlert('Enter the account number.'); return; }
+      r.accountNo = acc;
+      var ie = document.getElementById('v4e-inst'); if (ie) r.installment = ie.value === '' ? '' : NUM(ie.value);
+      cm('m-v4');
+      await updateLoanField(id, 'amount', amt);
+      renderLoansPage();
+    };
+  } else if (x.kind === 'machine') {
+    title = 'Edit machine loan';
+    html = v4Fld('Account no.', 'v4e-acc', r.accountNo) + v4Fld('Machine', 'v4e-name', r.machineType) + v4Fld('Amount (USD)', 'v4e-amt', NUM(r.usd), { num: 1 });
+    save = async function () {
+      r.accountNo = document.getElementById('v4e-acc').value.trim(); r.machineType = document.getElementById('v4e-name').value.trim();
+      r.usd = NUM(document.getElementById('v4e-amt').value); r.bdt = r.usd * NUM(r.rate || LOANS.settings && LOANS.settings.machineRate);
+      cm('m-v4'); showSync('saving', 'Saving...');
+      try { await api('saveMachineLoan', r); showSync('ok', 'Saved'); } catch (e) { showSync('err', 'Save failed'); showAlert(e.message); }
+      renderLoansPage();
+    };
+  } else if (x.kind === 'fdr') {
+    title = 'Edit FDR \u2014 ' + (r.accountNo || '');
+    html = v4Fld('Bank', 'v4e-bank', r.bank) + v4Fld('Account no.', 'v4e-acc', r.accountNo) + v4Fld('Amount (BDT)', 'v4e-amt', NUM(r.amount), { num: 1 });
+    save = async function () {
+      var acc = document.getElementById('v4e-acc').value.trim();
+      if (!acc) { showAlert('Enter the account number.'); return; }
+      r.bank = document.getElementById('v4e-bank').value.trim(); r.accountNo = acc;
+      cm('m-v4');
+      await updateFDRAmount(id, document.getElementById('v4e-amt').value);
+      if (typeof renderFDRDetail === 'function') try { renderFDRDetail(); } catch (e) {}
+      if (typeof renderFDRDashboard === 'function') try { renderFDRDashboard(); } catch (e) {}
+    };
+  } else if (x.kind === 'creditor') {
+    var qty = getCreditorCategoryMode(r.category) === 'qty';
+    title = 'Edit \u2014 ' + (r.name || '');
+    html = v4Fld('Name', 'v4e-name', r.name)
+      + (qty ? v4Fld('Quantity', 'v4e-qty', NUM(r.quantity), { num: 1 }) + v4Fld('Rate (' + (r.currency || 'BDT') + ')', 'v4e-rate', NUM(r.rate), { num: 1 })
+             : v4Fld('Amount (' + (r.currency || 'BDT') + ')', 'v4e-amt', NUM(r.amount), { num: 1 }))
+      + v4Fld('Notes', 'v4e-notes', r.notes);
+    save = async function () {
+      var nm = document.getElementById('v4e-name').value.trim();
+      if (!nm) { showAlert('Enter a name.'); return; }
+      r.name = nm; r.notes = document.getElementById('v4e-notes').value.trim();
+      cm('m-v4');
+      if (qty) { r.quantity = NUM(document.getElementById('v4e-qty').value); await updateCreditorField(id, 'rate', document.getElementById('v4e-rate').value); }
+      else await updateCreditorField(id, 'amount', document.getElementById('v4e-amt').value);
+      renderCreditorsPage();
+    };
+  } else if (x.kind === 'liability') {
+    var usd = r.currency === 'USD';
+    title = 'Edit liability';
+    html = v4Fld('Name', 'v4e-name', r.name) + v4Fld('Amount (' + (usd ? 'USD' : 'BDT') + ')', 'v4e-amt', NUM(usd ? r.usdAmount : r.bdtAmount), { num: 1 });
+    save = async function () {
+      var nm = document.getElementById('v4e-name').value.trim();
+      if (!nm) { showAlert('Enter a name.'); return; }
+      r.name = nm;
+      cm('m-v4');
+      await updateLiabilityField(id, usd ? 'usdAmount' : 'bdtAmount', document.getElementById('v4e-amt').value);
+      renderLiabilityPage();
+    };
+  }
+  v4Open(title, html, 'Save', save);
+}
+
+// ── 4. Bond: import weight, wastage, exports (fabric and yarn Cash LCs) ──
+var BOND = { w: { fabric: 15, yarn: 25 } };
+var _v4ApplyLoad = finApplyLoad;
+finApplyLoad = function (data) {
+  if (data && data.bondWastage && typeof data.bondWastage === 'object') BOND.w = data.bondWastage;
+  return _v4ApplyLoad.apply(this, arguments);
+};
+function bondMat(r) { return r.material === 'yarn' ? 'yarn' : 'fabric'; }
+function bondMatLabel(m) { return m.charAt(0).toUpperCase() + m.slice(1); }
+function bondPct(m) { var v = Number(BOND.w[m]); return isFinite(v) ? v : (m === 'yarn' ? 25 : 15); }
+function bondExports(r) { try { var a = JSON.parse(r.exports || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function KG(n) { return Number(n || 0).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' kg'; }
+function bondOf(r) {
+  var m = bondMat(r), pct = bondPct(m), kg = NUM(r.importKg), has = r.importKg !== '' && r.importKg != null && kg > 0;
+  var waste = has ? kg * pct / 100 : 0, must = has ? kg - waste : 0;
+  var exp = bondExports(r).reduce(function (s, e) { return s + NUM(e.kg); }, 0);
+  var bal = has ? Math.max(0, Math.round((must - exp) * 1000) / 1000) : 0;
+  var st = !has ? 'missing' : bal <= 0.0005 ? 'covered' : exp > 0 ? 'part' : 'none';
+  return { m: m, pct: pct, kg: kg, has: has, waste: waste, must: must, exp: exp, bal: bal, st: st };
+}
+function bondPill(b) {
+  if (b.st === 'missing') return '<span class="chip n">Import weight not entered</span>';
+  if (b.st === 'covered') return '<span class="chip g">Covered</span>';
+  if (b.st === 'none') return '<span class="chip r">Nothing exported yet</span>';
+  return '<span class="chip a">' + KG(b.bal) + ' still to export</span>';
+}
+function bondRows(partyId) { return ST.debits.filter(function (d) { return String(d.partyId) === String(partyId); }).sort(function (a, b) { return String(a.date).localeCompare(String(b.date)); }); }
+var BOND_F = 'all';
+function bondFilter(f) { BOND_F = f; renderBondTab(); }
+function renderBondTab() {
+  var host = document.getElementById('tab-bond'); if (!host) return;
+  var p = ST.parties.find(function (x) { return x.id === ST.cParty; });
+  if (!p || p.ptype !== 'fabric') { host.innerHTML = ''; return; }
+  var rows = bondRows(p.id), all = rows.map(function (r) { return { r: r, b: bondOf(r) }; });
+  var t = { kg: 0, waste: 0, must: 0, exp: 0, bal: 0, open: 0, miss: 0 }, mats = {};
+  all.forEach(function (x) { if (x.b.has) { t.kg += x.b.kg; t.waste += x.b.waste; t.must += x.b.must; t.exp += x.b.exp; t.bal += x.b.bal; if (x.b.bal > 0) t.open++; } else t.miss++; mats[x.b.m] = 1; });
+  var shown = all.filter(function (x) { return BOND_F === 'all' || (BOND_F === 'open' && x.b.has && x.b.bal > 0) || (BOND_F === 'covered' && x.b.st === 'covered') || (BOND_F === 'missing' && !x.b.has); });
+  var pct = t.must > 0 ? Math.min(100, Math.round(t.exp / t.must * 100)) : 0;
+  var ed = canEditCash();
+  host.innerHTML = '<div class="bond-sum">'
+    + '<div><div class="sl">Imported under bond</div><div class="sv">' + KG(t.kg) + '</div><div class="ss">' + all.length + ' LC' + (all.length === 1 ? '' : 's') + (t.miss ? ' &middot; ' + t.miss + ' without weight' : '') + '</div></div>'
+    + '<div><div class="sl">Wastage allowed</div><div class="sv">' + KG(t.waste) + '</div><div class="ss">' + Object.keys(mats).map(function (m) { return bondMatLabel(m) + ' ' + bondPct(m) + '%'; }).join(' &middot; ') + '</div></div>'
+    + '<div><div class="sl">Must be exported</div><div class="sv">' + KG(t.must) + '</div><div class="ss">Import minus wastage</div></div>'
+    + '<div><div class="sl">Exported so far</div><div class="sv" style="color:var(--gr)">' + KG(t.exp) + '</div><div class="bond-bar"><i style="width:' + pct + '%"></i></div><div class="ss">' + pct + '% covered</div></div>'
+    + '<div class="' + (t.bal > 0 ? 'bad' : 'good') + '"><div class="sl">Still to export</div><div class="sv">' + KG(t.bal) + '</div><div class="ss">' + (t.open ? t.open + ' LC' + (t.open === 1 ? '' : 's') + ' not covered yet' : 'All covered') + '</div></div></div>'
+    + '<div class="bond-fbar no-print"><span class="lbl">Show</span>'
+    + [['all', 'All'], ['open', 'Not covered (' + t.open + ')'], ['covered', 'Covered'], ['missing', 'Weight missing (' + t.miss + ')']].map(function (f) { return '<button class="btn ' + (BOND_F === f[0] ? 'bp' : 'bg') + ' bsm" onclick="bondFilter(\'' + f[0] + '\')">' + f[1] + '</button>'; }).join('')
+    + '<span style="flex:1"></span><button class="btn bg bsm" onclick="printBond()">Print bond statement</button></div>'
+    + '<div class="tw"><table class="bond-t"><thead><tr><th>#</th><th>L/C No.</th><th>Supplier</th><th>Material</th><th class="r">Import weight</th><th class="r">Wastage allowed</th><th class="r">Must export</th><th class="r">Exported</th><th class="r">Balance</th><th>Bond status</th>' + (ed ? '<th class="no-print">Actions</th>' : '<th class="no-print"></th>') + '</tr></thead><tbody>'
+    + (shown.length ? shown.map(function (x, i) {
+      var r = x.r, b = x.b;
+      return '<tr id="bond-' + r.id + '"><td class="dm">' + (i + 1) + '</td><td class="mn v4-lclink" style="font-weight:700" onclick="openLcTimeline(\'' + jsq(r.bankLcId) + '\')">' + esc(r.lc) + '</td><td>' + esc(r.company || '\u2014') + '</td>'
+        + '<td>' + bondMatLabel(b.m) + ' <span class="dm">' + b.pct + '%</span></td>'
+        + '<td class="r mn">' + (b.has ? KG(b.kg) : '\u2014') + '</td><td class="r mn dm">' + (b.has ? KG(b.waste) : '\u2014') + '</td><td class="r mn">' + (b.has ? KG(b.must) : '\u2014') + '</td>'
+        + '<td class="r mn" style="color:var(--gr)">' + (b.exp ? KG(b.exp) : (b.has ? '0 kg' : '\u2014')) + '</td>'
+        + '<td class="r mn" style="font-weight:700;color:' + (!b.has ? 'var(--tx3)' : b.bal > 0 ? 'var(--rd)' : 'var(--gr)') + '">' + (b.has ? KG(b.bal) : '\u2014') + '</td>'
+        + '<td>' + bondPill(b) + '</td>'
+        + '<td class="no-print">' + (ed ? '<button class="btn ' + (b.has ? 'bp' : 'bp') + ' bsm" onclick="openBond(\'' + jsq(r.id) + '\')">' + (b.has ? '+ Export / Edit' : 'Enter import weight') + '</button>' : '<button class="btn bg bsm" onclick="openBond(\'' + jsq(r.id) + '\')">View</button>') + '</td></tr>';
+    }).join('') : '<tr><td colspan="11" style="text-align:center;color:var(--tx3);padding:20px">Nothing to show.</td></tr>')
+    + '</tbody>' + (all.length ? '<tfoot><tr class="bond-tot"><td colspan="4">Total</td><td class="r mn">' + KG(t.kg) + '</td><td class="r mn">' + KG(t.waste) + '</td><td class="r mn">' + KG(t.must) + '</td><td class="r mn">' + KG(t.exp) + '</td><td class="r mn" style="color:' + (t.bal > 0 ? 'var(--rd)' : 'var(--gr)') + '">' + KG(t.bal) + '</td><td colspan="2"></td></tr></tfoot>' : '') + '</table></div>';
+}
+var _bondEdit = null;
+function openBond(debitId) {
+  var r = FIN.state.debits[debitId]; if (!r) return;
+  var ed = canEditCash();
+  _bondEdit = { id: debitId, exports: bondExports(r).slice(), mat: bondMat(r) };
+  var l = lcOf(r.bankLcId) || {};
+  v4Open('Bond weight \u2014 LC ' + r.lc,
+    '<div class="dm" style="margin-bottom:12px">' + esc(r.company || '') + ' &middot; ' + FU(NUM(r.usd)) + ' &middot; opened ' + FD(r.date) + '</div>'
+    + '<div class="bond-grid"><div class="mfg"><label>Material</label><select id="bd-mat" onchange="bondCalc()"' + (ed ? '' : ' disabled') + '>' + Object.keys(BOND.w).concat(['fabric', 'yarn']).filter(function (v, i, a) { return a.indexOf(v) === i; }).map(function (m) { return '<option value="' + esc(m) + '"' + (m === bondMat(r) ? ' selected' : '') + '>' + esc(bondMatLabel(m)) + '</option>'; }).join('') + '</select></div>'
+    + '<div class="mfg"><label>Import weight (kg)</label><input type="number" id="bd-kg" value="' + (r.importKg === '' || r.importKg == null ? '' : NUM(r.importKg)) + '" oninput="bondCalc()"' + (ed ? '' : ' disabled') + '></div>'
+    + '<div class="mfg"><label>Wastage allowed</label><div id="bd-waste" class="bond-ro"></div></div></div>'
+    + '<div id="bd-calc" class="bond-calc"></div>'
+    + '<div style="font-weight:700;margin:14px 0 6px">Exports against this LC</div>'
+    + '<div id="bd-list"></div>',
+    ed ? 'Save' : null, ed ? saveBond : null);
+  bondDrawList(); bondCalc();
+}
+var BD_ENTER = ' onkeydown="if(event.key===\'Enter\'){event.preventDefault();event.stopPropagation();bondAddExport();}"';
+function bondDrawList() {
+  var ed = canEditCash(), ex = _bondEdit.exports;
+  document.getElementById('bd-list').innerHTML = '<table class="bond-t"><thead><tr><th>Date</th><th>Export invoice / UD no.</th><th class="r">Weight</th>' + (ed ? '<th></th>' : '') + '</tr></thead><tbody>'
+    + ex.map(function (e, i) { return '<tr><td>' + FD(e.d) + '</td><td>' + esc(e.ref || '\u2014') + '</td><td class="r mn">' + KG(e.kg) + '</td>' + (ed ? '<td class="r"><button class="btn bg bsm" onclick="bondDelExport(' + i + ')">Remove</button></td>' : '') + '</tr>'; }).join('')
+    + (ed ? '<tr><td><input type="date" id="bd-d" value="' + todayISO() + '"' + BD_ENTER + '></td><td><input type="text" id="bd-ref" placeholder="Invoice or UD number"' + BD_ENTER + '></td><td class="r"><input type="number" id="bd-ekg" placeholder="0.00" style="text-align:right;width:120px"' + BD_ENTER + '></td><td class="r"><button class="btn bp bsm" id="bd-add" onclick="bondAddExport()">Add</button></td></tr>' : (ex.length ? '' : '<tr><td colspan="3" style="color:var(--tx3);text-align:center;padding:12px">No exports recorded.</td></tr>'))
+    + '</tbody></table>';
+}
+function bondCalc() {
+  var m = document.getElementById('bd-mat').value, kg = NUM(document.getElementById('bd-kg').value), pct = bondPct(m);
+  var exp = _bondEdit.exports.reduce(function (s, e) { return s + NUM(e.kg); }, 0), must = kg - kg * pct / 100, bal = Math.max(0, must - exp);
+  document.getElementById('bd-waste').textContent = pct + '%  =  ' + KG(kg * pct / 100);
+  document.getElementById('bd-calc').innerHTML = kg > 0 ? '<span>Must be exported: <b class="mn">' + KG(must) + '</b></span><span>Exported: <b class="mn" style="color:var(--gr)">' + KG(exp) + '</b></span><span>Still to export: <b class="mn" style="color:' + (bal > 0 ? 'var(--rd)' : 'var(--gr)') + '">' + KG(bal) + '</b></span>' : '<span class="dm">Enter the import weight to see how much must be exported.</span>';
+}
+function bondAddExport() {
+  var d = document.getElementById('bd-d').value, ref = document.getElementById('bd-ref').value.trim(), kg = NUM(document.getElementById('bd-ekg').value);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { showAlert('Enter the export date.'); return; }
+  if (!(kg > 0)) { showAlert('Enter the exported weight in kg.'); return; }
+  _bondEdit.exports.push({ d: d, ref: ref, kg: Math.round(kg * 1000) / 1000 });
+  bondDrawList(); bondCalc();
+  setTimeout(function () { var e = document.getElementById('bd-ekg'); if (e) e.focus(); }, 30);
+}
+function bondDelExport(i) { _bondEdit.exports.splice(i, 1); bondDrawList(); bondCalc(); }
+async function saveBond() {
+  if (!canEditCash() || !_bondEdit) return;
+  // a filled-in export line that was not added yet is added now
+  var pend = document.getElementById('bd-ekg');
+  if (pend && NUM(pend.value) > 0) { bondAddExport(); }
+  var id = _bondEdit.id, r = FIN.state.debits[id]; if (!r) return;
+  var mat = document.getElementById('bd-mat').value, kgv = document.getElementById('bd-kg').value, kg = kgv === '' ? '' : NUM(kgv);
+  if (kgv !== '' && !(kg >= 0)) { showAlert('Enter the import weight in kg.'); return; }
+  var ex = JSON.stringify(_bondEdit.exports);
+  showSync('saving', 'Saving bond weight...');
+  try {
+    if ((r.material || 'fabric') !== mat) { await api('updateDebit', { id: id, field: 'material', value: mat }); finSetDebitField(id, 'material', mat); }
+    if (String(r.importKg === '' || r.importKg == null ? '' : NUM(r.importKg)) !== String(kg)) { await api('updateDebit', { id: id, field: 'importKg', value: kg }); finSetDebitField(id, 'importKg', kg); }
+    if ((r.exports || '[]') !== ex) { await api('updateDebit', { id: id, field: 'exports', value: ex }); finSetDebitField(id, 'exports', ex); }
+    cm('m-v4'); showSync('ok', 'Bond weight saved');
+    renderBondTab(); if (ST.activeTab === 'debit') rDT();
+  } catch (e) { showSync('err', 'Save failed'); showAlert(e.message, 'Not saved'); }
+}
+// after "+ Add LC" in a fabric ledger: material and import weight
+function bondAfterAdd(debitId, isFab) {
+  if (!isFab) return false;
+  var m = (document.getElementById('lmat') || {}).value || 'fabric', kgv = (document.getElementById('lkg') || {}).value || '';
+  (async function () {
+    // wait until the server has saved the new LC
+    for (var i = 0; i < 100 && !(FIN.confirmed && FIN.confirmed.debits && FIN.confirmed.debits[debitId]); i++) await new Promise(function (r) { setTimeout(r, 150); });
+    if (!FIN.state.debits[debitId]) return;
+    try {
+      if (m !== 'fabric') { await api('updateDebit', { id: debitId, field: 'material', value: m }); finSetDebitField(debitId, 'material', m); }
+      if (kgv !== '' && NUM(kgv) > 0) { await api('updateDebit', { id: debitId, field: 'importKg', value: NUM(kgv) }); finSetDebitField(debitId, 'importKg', NUM(kgv)); }
+      if (document.getElementById('page-party').classList.contains('active')) { rDT(); renderBondTab(); }
+    } catch (e) { showAlert('The LC was added, but the bond weight was not saved: ' + e.message + '\n\nOpen the Bond tab to enter it.', 'Bond weight'); }
+  })();
+  return false;
+}
+function onLCMatChange() {
+  var m = document.getElementById('lmat').value, kg = NUM(document.getElementById('lkg').value), e = document.getElementById('lkg-hint');
+  if (e) e.innerHTML = kg > 0 ? bondMatLabel(m) + ' wastage ' + bondPct(m) + '% &rarr; must export <b>' + KG(kg - kg * bondPct(m) / 100) + '</b>' : bondMatLabel(m) + ' wastage ' + bondPct(m) + '%';
+}
+function printBond() {
+  var p = ST.parties.find(function (x) { return x.id === ST.cParty; }); if (!p) return;
+  var rows = bondRows(p.id).map(function (r) { return { r: r, b: bondOf(r) }; });
+  var w = window.open('', '_blank'); if (!w) { showAlert('Allow pop-ups to print.'); return; }
+  var t = { kg: 0, must: 0, exp: 0, bal: 0 }; rows.forEach(function (x) { t.kg += x.b.kg; t.must += x.b.must; t.exp += x.b.exp; t.bal += x.b.bal; });
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Bond statement</title><style>@page{size:A4 landscape;margin:16mm 16mm 20mm 16mm;@bottom-left{content:"Bond statement";font:8px Helvetica,Arial,sans-serif;color:#86868b}@bottom-right{content:"Page " counter(page) " of " counter(pages);font:8px Helvetica,Arial,sans-serif;color:#86868b}}body{font:11px Helvetica,Arial,sans-serif;color:#111}h1{font-size:16px;margin:0 0 2px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border-bottom:1px solid #ddd;padding:5px 6px;text-align:left}th{background:#f2f2f2}td.r,th.r{text-align:right}tr{break-inside:avoid}tfoot td{font-weight:700;background:#f7f7f7}</style></head><body>'
+    + '<h1>XYX FASHION &mdash; Bond statement</h1><div>' + esc(p.name) + ' (Fabric / Yarn) &middot; ' + FD(todayISO()) + '</div>'
+    + '<table><thead><tr><th>#</th><th>L/C No.</th><th>Supplier</th><th>Material</th><th class="r">Import</th><th class="r">Wastage</th><th class="r">Must export</th><th class="r">Exported</th><th class="r">Balance</th></tr></thead><tbody>'
+    + rows.map(function (x, i) { var b = x.b; return '<tr><td>' + (i + 1) + '</td><td>' + esc(x.r.lc) + '</td><td>' + esc(x.r.company || '') + '</td><td>' + bondMatLabel(b.m) + ' ' + b.pct + '%</td><td class="r">' + (b.has ? KG(b.kg) : '-') + '</td><td class="r">' + (b.has ? KG(b.waste) : '-') + '</td><td class="r">' + (b.has ? KG(b.must) : '-') + '</td><td class="r">' + KG(b.exp) + '</td><td class="r">' + (b.has ? KG(b.bal) : '-') + '</td></tr>'; }).join('')
+    + '</tbody><tfoot><tr><td colspan="4">Total</td><td class="r">' + KG(t.kg) + '</td><td></td><td class="r">' + KG(t.must) + '</td><td class="r">' + KG(t.exp) + '</td><td class="r">' + KG(t.bal) + '</td></tr></tfoot></table></body></html>');
+  w.document.close(); setTimeout(function () { w.print(); }, 300);
+}
+// the ledger tabs: Debit / Credit / Running Balance / Bond (fabric ledgers only)
+function switchTab(tab) {
+  var p = ST.parties.find(function (x) { return x.id === ST.cParty; });
+  if (tab === 'bond' && !(p && p.ptype === 'fabric')) tab = 'debit';
+  ST.activeTab = tab;
+  document.querySelectorAll('#page-party .tabs .tab').forEach(function (el) { el.classList.toggle('active', el.getAttribute('data-t') === tab); });
+  ['debit', 'credit', 'running', 'bond'].forEach(function (k) { var e = document.getElementById('tab-' + k); if (e) e.style.display = tab === k ? 'block' : 'none'; });
+  if (tab === 'debit') rDT(); if (tab === 'credit') rCT(); if (tab === 'running') rRB(); if (tab === 'bond') renderBondTab();
+}
+function bondTabRefresh() {
+  var p = ST.parties.find(function (x) { return x.id === ST.cParty; }), t = document.getElementById('tab-bond-btn');
+  if (!t) return;
+  var fab = !!(p && p.ptype === 'fabric');
+  t.style.display = fab ? '' : 'none';
+  if (fab) {
+    var n = bondRows(p.id).filter(function (r) { var b = bondOf(r); return b.has && b.bal > 0; }).length, c = document.getElementById('tab-bond-cnt');
+    if (c) { c.textContent = n || ''; c.style.display = n ? '' : 'none'; }
+  }
+  if (!fab && ST.activeTab === 'bond') switchTab('debit');
+  if (fab && ST.activeTab === 'bond') renderBondTab();
+}
+var _v4PartyPage = renderPartyPage;
+renderPartyPage = function () { var r = _v4PartyPage.apply(this, arguments); try { bondTabRefresh(); } catch (e) {} return r; };
+var _v4RDT = rDT;
+rDT = function () { var r = _v4RDT.apply(this, arguments); try { bondTabRefresh(); } catch (e) {} return r; };
+
+// Admin panel: Bond
+async function admBond() {
+  var b = $$('adm-body'), keys = Object.keys(BOND.w);
+  ['fabric', 'yarn'].forEach(function (k) { if (keys.indexOf(k) < 0) keys.push(k); });
+  var pos = {};
+  ST.parties.filter(function (p) { return p.ptype === 'fabric'; }).forEach(function (p) {
+    bondRows(p.id).forEach(function (r) {
+      var x = bondOf(r), k = p.name + '|' + x.m, o = pos[k] = pos[k] || { party: p.name, m: x.m, kg: 0, must: 0, exp: 0, bal: 0, open: 0, miss: 0 };
+      if (x.has) { o.kg += x.kg; o.must += x.must; o.exp += x.exp; o.bal += x.bal; if (x.bal > 0) o.open++; } else o.miss++;
+    });
+  });
+  var list = Object.keys(pos).sort().map(function (k) { return pos[k]; }), T = { kg: 0, must: 0, exp: 0, bal: 0 };
+  list.forEach(function (o) { T.kg += o.kg; T.must += o.must; T.exp += o.exp; T.bal += o.bal; });
+  b.innerHTML = '<div class="adm-card"><h3>Wastage the government allows</h3><div class="adm-sub">Must export = import weight minus wastage. Changing a rate here re-calculates every LC straight away.</div>'
+    + '<table class="bond-t" style="max-width:760px"><thead><tr><th>Material</th><th class="r">Wastage allowed (%)</th><th>Example</th></tr></thead><tbody>'
+    + keys.map(function (k) { var v = bondPct(k); return '<tr><td><b>' + esc(bondMatLabel(k)) + '</b></td><td class="r"><input type="number" class="bw-in" data-k="' + esc(k) + '" value="' + v + '" style="width:110px;text-align:right" oninput="admBondEx(this)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();admBondSave();}"></td><td class="dm" id="bw-ex-' + esc(k) + '">Import 10 kg &rarr; export at least ' + KG(10 - 10 * v / 100) + '</td></tr>'; }).join('')
+    + '</tbody></table><div style="margin-top:12px;display:flex;gap:8px"><button class="btn bp bsm" id="bw-save" onclick="admBondSave()">Save wastage rates</button></div></div>'
+    + '<div class="adm-card"><h3>Bond position, all parties</h3><div class="adm-sub">Everything imported under bond through Cash LC, against what has been exported.</div>'
+    + '<table class="bond-t"><thead><tr><th>Party</th><th>Material</th><th class="r">Imported</th><th class="r">Must export</th><th class="r">Exported</th><th class="r">Still to export</th><th>Status</th></tr></thead><tbody>'
+    + (list.length ? list.map(function (o) { return '<tr><td><b>' + esc(o.party) + '</b></td><td>' + bondMatLabel(o.m) + '</td><td class="r mn">' + KG(o.kg) + '</td><td class="r mn">' + KG(o.must) + '</td><td class="r mn">' + KG(o.exp) + '</td><td class="r mn" style="font-weight:700;color:' + (o.bal > 0 ? 'var(--rd)' : 'var(--gr)') + '">' + KG(o.bal) + '</td><td>' + (o.open ? '<span class="chip a">' + o.open + ' LC' + (o.open === 1 ? '' : 's') + ' not covered</span>' : '<span class="chip g">Covered</span>') + (o.miss ? ' <span class="chip n">' + o.miss + ' without weight</span>' : '') + '</td></tr>'; }).join('')
+      : '<tr><td colspan="7" style="text-align:center;color:var(--tx3);padding:18px">No fabric or yarn Cash LCs yet.</td></tr>')
+    + '</tbody>' + (list.length ? '<tfoot><tr class="bond-tot"><td colspan="2">Total</td><td class="r mn">' + KG(T.kg) + '</td><td class="r mn">' + KG(T.must) + '</td><td class="r mn">' + KG(T.exp) + '</td><td class="r mn" style="color:' + (T.bal > 0 ? 'var(--rd)' : 'var(--gr)') + '">' + KG(T.bal) + '</td><td></td></tr></tfoot>' : '') + '</table></div>';
+}
+function admBondEx(inp) { var v = NUM(inp.value), e = document.getElementById('bw-ex-' + inp.getAttribute('data-k')); if (e) e.innerHTML = 'Import 10 kg &rarr; export at least ' + KG(10 - 10 * v / 100); }
+async function admBondSave() {
+  var rates = {}, bad = '';
+  document.querySelectorAll('#adm-body .bw-in').forEach(function (i) { var v = Number(i.value); if (!(v >= 0 && v <= 90)) bad = bondMatLabel(i.getAttribute('data-k')); rates[i.getAttribute('data-k')] = v; });
+  if (bad) { showAlert('The wastage for ' + bad + ' must be between 0 and 90 percent.'); return; }
+  try { var r = await api('saveBondWastage', { rates: rates }); BOND.w = r.bondWastage || rates; showSync('ok', 'Wastage rates saved'); admBond(); }
+  catch (e) { showAlert(e.message, 'Not saved'); }
+}
+
+// ── 5. LC timeline: everything that happened to one LC, in date order ──
+function v4Hist(txt) { try { var a = JSON.parse(txt || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function openLcTimeline(lcId) {
+  var l = lcOf(lcId), a = aggOf(lcId);
+  if (!l || !a) { showAlert('This LC is no longer in Banking.'); return; }
+  var ev = [], db = a.debitId ? FIN.state.debits[a.debitId] : null, com = isCom();
+  function add(date, title, text, kind, by) { ev.push({ d: String(date || '').slice(0, 10), t: title, x: text || '', k: kind || '', by: by || '' }); }
+  add(l.date, 'LC opened', UC(a.usd) + (l.expiryDate ? ' &middot; expiry ' + FD(l.expiryDate) : '') + (db && !com ? ' &middot; Cash LC party ' + esc(lcPartyLabel(lcId) || '') : ''));
+  var n = 0;
+  if (!com) a.docs.forEach(function (d) {
+    n++; var c = LCM.cents(d.usd), lab = (a.docs.length > 1 ? ' (shipment ' + n + ')' : '');
+    if (d.arrivedDate) add(d.arrivedDate, 'Documents arrived &mdash; ' + UC(c) + lab, esc(d.remarks || ''));
+    v4Hist(d.stopHistory).forEach(function (h) { add(h.stopped, 'STOP ACCEPTANCE' + lab, esc(h.note || '') + (h.resolved ? ' &middot; resolved ' + FD(h.resolved) + (h.resolveNote ? ': ' + esc(h.resolveNote) : '') : ''), 'warn', h.by); });
+    if (d.stop === 'yes') add(d.stopDate, 'STOP ACCEPTANCE' + lab, esc(d.stopNote || '') + ' &middot; not resolved yet', 'warn', d.stopBy);
+    if (d.acceptedDate && d.status !== 'atbank') add(d.acceptedDate, 'Acceptance given &mdash; ' + UC(c) + lab, d.maturityDate ? 'Maturity ' + FD(d.maturityDate) : 'No maturity date');
+    if (d.status === 'paid') add(d.paidDate, 'Paid to bank &mdash; ' + UC(c) + lab, '');
+    else if (d.status === 'accepted' && d.maturityDate) add(d.maturityDate, 'Payment due &mdash; ' + UC(c) + lab, dayDiff(todayISO(), d.maturityDate) < 0 ? 'OVERDUE ' + (-dayDiff(todayISO(), d.maturityDate)) + ' days' : 'in ' + dayDiff(todayISO(), d.maturityDate) + ' days &middot; ' + TKc(c) + ' at today&rsquo;s rate', dayDiff(todayISO(), d.maturityDate) < 0 ? 'warn' : 'pend');
+  });
+  if (!com) {
+    v4Hist(l.stopHistory).forEach(function (h) { add(h.stopped, 'STOP ACCEPTANCE on the LC', esc(h.note || '') + (h.resolved ? ' &middot; resolved ' + FD(h.resolved) : ''), 'warn', h.by); });
+    if (l.stop === 'yes') add(l.stopDate, 'STOP ACCEPTANCE on the LC', esc(l.stopNote || '') + ' &middot; not resolved yet', 'warn', l.stopBy);
+    v4Hist(l.flagHistory).forEach(function (h) { add(h.applied, (h.type === 'cancel' ? 'Cancellation' : 'Acceptance hold') + ' applied', esc(h.note || '') + (h.resolved ? ' &middot; ' + esc(h.outcome || 'resolved') + ' ' + FD(h.resolved) : ''), 'warn'); });
+    if (l.flag) add(l.flagDate, (l.flag === 'cancel' ? 'Cancellation' : 'Acceptance hold') + ' applied', esc(l.flagNote || '') + ' &middot; not resolved yet', 'warn');
+    if (a.closed) add(l.closedDate, 'LC closed', 'No more documents will come');
+    if (db) {
+      var dl = []; try { dl = JSON.parse(db.deliveries || '[]'); } catch (e) {}
+      if (Array.isArray(dl) && dl.length) dl.forEach(function (x) { add(x.d, 'Delivered to party &mdash; ' + NUM(x.q) + ' packages', ''); });
+      bondExports(db).forEach(function (x) { add(x.d, 'Exported &mdash; ' + KG(x.kg), esc(x.ref || '')); });
+    }
+  }
+  ev.sort(function (x, y) { return (x.d || '9999').localeCompare(y.d || '9999'); });
+  var stillUsd = a.accepted + a.atBank;
+  var cards = '<div class="tl-cards">'
+    + '<div><div class="sl">LC value</div><div class="sv">' + UC(a.usd) + '</div></div>'
+    + (com ? '' : '<div><div class="sl">Documents received</div><div class="sv">' + UC(a.received) + '</div></div>'
+    + '<div><div class="sl">Accepted</div><div class="sv">' + UC(a.accepted + a.paid) + '</div></div>'
+    + '<div><div class="sl">Paid to bank</div><div class="sv" style="color:var(--gr)">' + UC(a.paid) + '</div></div>'
+    + '<div class="' + (stillUsd > 0 ? 'bad' : '') + '"><div class="sl">Still to pay</div><div class="sv">' + UC(stillUsd) + '</div></div>') + '</div>';
+  var side = '';
+  if (db && !com) {
+    var pl = cashPillsHtml(db), p = ST.parties.find(function (x) { return String(x.id) === String(db.partyId); });
+    side += '<div class="tl-box"><div class="tl-bh"><b>Cash LC side</b><span class="chip g">In sync with Banking</span></div><table class="bond-t"><tbody>'
+      + '<tr><td>Party</td><td class="r"><b>' + esc(lcPartyLabel(lcId) || '') + '</b></td></tr>'
+      + '<tr><td>LC BDT' + (NUM(db.commission) ? ' + commission' : '') + '</td><td class="r mn">' + F(NUM(db.bdt) + NUM(db.commission)) + '</td></tr>'
+      + '<tr><td>Doc / Acceptance / Payment</td><td class="r">' + pl.doc + ' ' + pl.accept + ' ' + pl.pay + '</td></tr>'
+      + '<tr><td>UD</td><td class="r">' + (db.ud === 'done' ? '<span class="chip g">UD done</span>' : '<span class="chip a">UD pending</span>') + '</td></tr></tbody></table>'
+      + (p ? '<div style="padding:10px 14px"><button class="btn bg bsm" onclick="cm(\'m-v4\');navigate(\'party\',\'' + jsq(p.id) + '\')">Open the party ledger</button></div>' : '') + '</div>';
+    if (p && p.ptype === 'fabric') {
+      var b = bondOf(db);
+      side += '<div class="tl-box"><div class="tl-bh"><b>Bond weight</b>' + bondPill(b) + '</div><table class="bond-t"><tbody>'
+        + '<tr><td>Imported (' + bondMatLabel(b.m) + ', ' + b.pct + '% wastage)</td><td class="r mn">' + (b.has ? KG(b.kg) : '\u2014') + '</td></tr>'
+        + '<tr><td>Must be exported</td><td class="r mn">' + (b.has ? KG(b.must) : '\u2014') + '</td></tr>'
+        + '<tr><td>Exported</td><td class="r mn" style="color:var(--gr)">' + KG(b.exp) + '</td></tr></tbody></table></div>';
+    }
+  }
+  var html = '<div class="dm" style="margin:-4px 0 14px">' + esc(l.supplier || '') + ' &middot; ' + esc(l.company || '') + (l.type ? ' &middot; ' + esc(l.type) : '') + (l.buyerName ? ' &middot; ' + esc(l.buyerName) : '') + '</div>' + cards
+    + '<div class="tl-wrap"><div class="tl-box" style="padding:18px 20px 4px"><div style="font-weight:800;font-size:16px;margin-bottom:14px">Timeline</div><div class="tl">'
+    + ev.map(function (e) { return '<div class="ev ' + e.k + '"><div class="d">' + (e.d ? FD(e.d) : 'No date') + (e.by ? ' &middot; ' + esc(e.by) : '') + '</div><div class="t">' + e.t + '</div>' + (e.x ? '<div class="x">' + e.x + '</div>' : '') + '</div>'; }).join('')
+    + '</div></div>' + (side ? '<div>' + side + '</div>' : '') + '</div>';
+  v4Open('LC ' + (l.lcNo || ''), html, null, null, true);
+}
+
+// ── 6. Banking rows: Cash LC rows blue everywhere, stronger overdue / expiry, LC number opens the timeline ──
+function maturityBadge(d) {
+  if (!d.maturityDate) return '<span class="chip r">No maturity date</span>';
+  var n = dayDiff(todayISO(), d.maturityDate);
+  if (n < 0) return '<span class="v4-solid rd">OVERDUE ' + (-n) + ' DAY' + (n === -1 ? '' : 'S') + '</span>';
+  if (n === 0) return '<span class="v4-solid rd">DUE TODAY</span>';
+  return n <= 7 ? '<span class="v4-solid am">DUE IN ' + n + ' DAY' + (n === 1 ? '' : 'S') + '</span>' : '<span class="chip n">in ' + n + ' days</span>';
+}
+function v4ExpiryHtml(date) {
+  if (!date) return '<span class="dm">\u2014</span>';
+  var n = dayDiff(todayISO(), date);
+  return '<b class="mn" style="color:var(--tx)">' + FD(date) + '</b><br>' + (n < 0 ? '<span class="v4-solid rd">EXPIRED ' + (-n) + ' DAY' + (n === -1 ? '' : 'S') + ' AGO</span>' : n <= 15 ? '<span class="v4-solid am">EXPIRES IN ' + n + ' DAY' + (n === 1 ? '' : 'S') + '</span>' : '<span class="dm">in ' + n + ' days</span>');
+}
+function v4LinkCell(td, lcId) {
+  if (!td || !lcId || td._v4l) return;
+  td._v4l = true; td.classList.add('v4-lclink'); td.title = 'Show everything that happened to this LC';
+  td.addEventListener('click', function (e) { if (e.target.closest('button,a,input,select')) return; openLcTimeline(lcId); });
+}
+function v4Rows(prefix, lcOfRow, lcCol, opts) {
+  document.querySelectorAll('tr[id^="' + prefix + '"]').forEach(function (tr) {
+    var key = tr.id.slice(prefix.length), lcId = lcOfRow(key); if (!lcId) return;
+    var a = aggOf(lcId), cash = !!(a && a.debitId) && !isCom();
+    tr.classList.toggle('v4-cash', cash && !lcFlag(lcId));
+    if (opts && opts.edge) { var e = opts.edge(key, lcId); tr.classList.toggle('v4-edge-rd', e === 'rd'); }
+    v4LinkCell(tr.children[lcCol], lcId);
+  });
+}
+var _v4Opened = renderOpenedLCs;
+renderOpenedLCs = function () {
+  var r = _v4Opened.apply(this, arguments);
+  v4Rows('bor-', function (id) { return id; }, 2, { edge: function (id) { var l = lcOf(id); return l && l.expiryDate && dayDiff(todayISO(), l.expiryDate) < 0 ? 'rd' : ''; } });
+  document.querySelectorAll('tr[id^="bor-"]').forEach(function (tr) { var l = lcOf(tr.id.slice(4)); if (l && tr.children[6]) tr.children[6].innerHTML = v4ExpiryHtml(l.expiryDate); });
+  return r;
+};
+var _v4AtBank = renderAtBank;
+renderAtBank = function () {
+  var r = _v4AtBank.apply(this, arguments);
+  v4Rows('dab-', function (id) { var d = FIN.state.docs[id]; return d && d.bankLcId; }, 1);
+  return r;
+};
+var _v4Acc = renderAcceptedBills;
+renderAcceptedBills = function () {
+  var r = _v4Acc.apply(this, arguments);
+  v4Rows('acc-', function (id) { var d = FIN.state.docs[id]; return d && d.bankLcId; }, 1, { edge: function (id) { var d = FIN.state.docs[id]; return d && d.maturityDate && d.maturityDate <= todayISO() ? 'rd' : ''; } });
+  return r;
+};
+var _v4Hist = renderHistory;
+renderHistory = function () {
+  var r = _v4Hist.apply(this, arguments);
+  v4Rows('hp-', function (id) { var d = FIN.state.docs[id]; return d && d.bankLcId; }, 1);
+  v4Rows('hcl-', function (id) { return id; }, 1);
+  return r;
+};
+
+// ── 7. Maturity calendar (Banking) ──
+var CAL = { ym: '' };
+function calShift(n) { var p = CAL.ym.split('-'), d = new Date(Date.UTC(+p[0], +p[1] - 1 + n, 1)); CAL.ym = d.toISOString().slice(0, 7); renderCalendar(); }
+function renderCalendar() {
+  var host = document.getElementById('cal-body'); if (!host || !FIN.idx) return;
+  var today = todayISO(); if (!CAL.ym) CAL.ym = today.slice(0, 7);
+  var docs = allDocs('accepted'), by = {}, overdue = { c: 0, n: 0 }, wk = { c: 0, n: 0 }, mo = { c: 0, n: 0 }, nm = { c: 0, n: 0 };
+  var in7 = new Date(Date.parse(today + 'T00:00:00Z') + 7 * 864e5).toISOString().slice(0, 10), in30 = new Date(Date.parse(today + 'T00:00:00Z') + 30 * 864e5).toISOString().slice(0, 10);
+  docs.forEach(function (d) {
+    var c = LCM.cents(d.usd), m = d.maturityDate || '';
+    if (m && m < today) { overdue.c += c; overdue.n++; }
+    if (m && m >= today && m <= in7) { wk.c += c; wk.n++; }
+    if (m && m >= today && m <= in30) { nm.c += c; nm.n++; }
+    if (m.slice(0, 7) === CAL.ym) { mo.c += c; mo.n++; (by[m] = by[m] || []).push(d); }
+  });
+  var p = CAL.ym.split('-'), y = +p[0], mth = +p[1], first = new Date(Date.UTC(y, mth - 1, 1)).getUTCDay(), days = new Date(Date.UTC(y, mth, 0)).getUTCDate();
+  var label = new Date(Date.UTC(y, mth - 1, 1)).toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  var cells = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(function (d) { return '<div class="hd">' + d + '</div>'; });
+  for (var i = 0; i < first; i++) cells.push('<div class="off"></div>');
+  for (var dn = 1; dn <= days; dn++) {
+    var ds = CAL.ym + '-' + (dn < 10 ? '0' : '') + dn, list = by[ds] || [], c = list.reduce(function (s, d) { return s + LCM.cents(d.usd); }, 0);
+    var late = list.length && ds < today;
+    cells.push('<div class="' + (late ? 'hot ' : '') + (ds === today ? 'today ' : '') + (list.length ? 'has' : '') + '"' + (list.length ? ' onclick="calDay(\'' + ds + '\')" title="Show these bills"' : '') + '><div class="dn">' + dn + '</div>'
+      + (list.length ? '<div class="amt">' + TKc(c) + '</div><div class="cnt">' + list.length + ' bill' + (list.length === 1 ? '' : 's') + ' &middot; ' + UC(c) + '</div>' : '') + '</div>');
+  }
+  while (cells.length % 7) cells.push('<div class="off"></div>');
+  host.innerHTML = '<div class="cal-top"><div class="cal-nav"><button class="btn bg bsm" onclick="calShift(-1)">&larr;</button><b>' + label + '</b><button class="btn bg bsm" onclick="calShift(1)">&rarr;</button>' + (CAL.ym !== today.slice(0, 7) ? '<button class="btn bg bsm" onclick="CAL.ym=\'\';renderCalendar()">This month</button>' : '') + '</div></div>'
+    + '<div class="cal-cards">'
+    + '<div class="' + (overdue.n ? 'bad' : '') + '"><div class="sl">Overdue now</div><div class="sv">' + TKc(overdue.c) + '</div><div class="ss">' + overdue.n + ' bill' + (overdue.n === 1 ? '' : 's') + ' &middot; ' + UC(overdue.c) + '</div></div>'
+    + '<div><div class="sl">Next 7 days</div><div class="sv">' + TKc(wk.c) + '</div><div class="ss">' + wk.n + ' bill' + (wk.n === 1 ? '' : 's') + ' &middot; ' + UC(wk.c) + '</div></div>'
+    + '<div><div class="sl">Next 30 days</div><div class="sv">' + TKc(nm.c) + '</div><div class="ss">' + nm.n + ' bill' + (nm.n === 1 ? '' : 's') + ' &middot; ' + UC(nm.c) + '</div></div>'
+    + '<div><div class="sl">' + label + '</div><div class="sv">' + TKc(mo.c) + '</div><div class="ss">' + mo.n + ' bill' + (mo.n === 1 ? '' : 's') + ' &middot; ' + UC(mo.c) + '</div></div></div>'
+    + '<div class="sw"><div class="cal">' + cells.join('') + '</div></div>'
+    + (docs.some(function (d) { return !d.maturityDate; }) ? '<div class="dm" style="margin-top:10px">' + docs.filter(function (d) { return !d.maturityDate; }).length + ' accepted bill(s) have no maturity date and are not on the calendar. See Accepted Bills.</div>' : '');
+}
+function calDay(ds) {
+  var list = allDocs('accepted').filter(function (d) { return d.maturityDate === ds; });
+  var tot = list.reduce(function (s, d) { return s + LCM.cents(d.usd); }, 0);
+  v4Open('Bills due ' + FD(ds), '<table class="bond-t"><thead><tr><th>LC No.</th><th>Supplier</th><th>Company</th><th class="r">USD</th><th class="r">BDT</th><th>Party</th><th></th></tr></thead><tbody>'
+    + list.map(function (d) { var l = lcOf(d.bankLcId) || {}, c = LCM.cents(d.usd); return '<tr class="' + (aggOf(d.bankLcId) && aggOf(d.bankLcId).debitId ? 'v4-cash' : '') + '"><td class="mn v4-lclink" style="font-weight:700" onclick="openLcTimeline(\'' + jsq(d.bankLcId) + '\')">' + esc(docLcNo(d)) + '</td><td>' + esc(l.supplier || '\u2014') + '</td><td>' + esc(l.company || '\u2014') + '</td><td class="r mn">' + UC(c) + '</td><td class="r mn">' + TKc(c) + '</td><td>' + partyTag(d.bankLcId) + '</td><td><button class="btn bp bsm" onclick="cm(\'m-v4\');openPayDocs(\'' + jsq(d.bankLcId) + '\',\'' + jsq(d.id) + '\')">Pay</button></td></tr>'; }).join('')
+    + '</tbody><tfoot><tr class="bond-tot"><td colspan="3">Total</td><td class="r mn">' + UC(tot) + '</td><td class="r mn">' + TKc(tot) + '</td><td colspan="2"></td></tr></tfoot></table>', null, null, true);
+}
+
+// ── 8. Grand totals also in words: crore, lakh, thousand ──
+function bdWords(n) {
+  n = Math.round(Math.abs(Number(n) || 0));
+  if (!n) return 'Zero taka';
+  var cr = Math.floor(n / 1e7), lk = Math.floor(n % 1e7 / 1e5), th = Math.floor(n % 1e5 / 1e3), rest = n % 1000, out = [];
+  if (cr) out.push(cr.toLocaleString('en-US') + ' crore');
+  if (lk) out.push(lk + ' lakh');
+  if (th) out.push(th + ' thousand');
+  if (rest) out.push(String(rest));
+  return out.join(' ') + ' taka';
+}
+function v4Words(el) {
+  if (!el) return;
+  var v = parseFloat(String(el.textContent || '').replace(/[^0-9.\-]/g, '')) || 0;
+  var w = el.nextElementSibling && el.nextElementSibling.classList.contains('v4-words') ? el.nextElementSibling : null;
+  if (!w) { w = document.createElement('div'); w.className = 'v4-words'; el.parentNode.insertBefore(w, el.nextSibling); }
+  w.textContent = bdWords(v);
+}
+function v4WrapWords(name, find) {
+  var f = window[name]; if (typeof f !== 'function') return;
+  window[name] = function () { var r = f.apply(this, arguments); try { find().forEach(v4Words); } catch (e) {} return r; };
+}
+v4WrapWords('renderLoanSummary', function () { var b = document.querySelector('#loans-summary > div'); return b ? Array.prototype.filter.call(b.querySelectorAll('div'), function (d) { return /38px/.test(d.getAttribute('style') || ''); }) : []; });
+v4WrapWords('renderFDRDashboard', function () { return ['fdr-total-company', 'fdr-total-personal', 'fdr-total-grand'].map(function (i) { return document.getElementById(i); }); });
+v4WrapWords('renderCreditorGrandTotal', function () { return [document.getElementById('cred-grand-total')]; });
+v4WrapWords('renderLiabilityGrandTotal', function () { return [document.getElementById('liab-grand-total')]; });
+v4WrapWords('renderBankStrip', function () { return [document.getElementById('bs-liab')]; });
+
+// ── 9. Every printout: clear borders, repeating headers, no split rows, headings kept with their table ──
+var V4_PRINT_CSS = '<style id="v4-print">'
+  + 'html{-webkit-print-color-adjust:exact;print-color-adjust:exact}'
+  + 'body{font-size:10.5px}'
+  + 'table{border-collapse:collapse!important;border:1.2px solid #444!important;width:100%}'
+  + 'th,td{border:0.8px solid #a3a3a3!important}'
+  + 'thead th{background:#ececec!important;color:#111!important;border-bottom:1.6px solid #333!important;font-size:9px!important;padding:6px 6px!important;vertical-align:bottom}'
+  + 'tbody td{font-size:10px!important;padding:5px 6px!important;color:#111}'
+  + 'tbody tr:nth-child(even) td{background:#fafafa}'
+  + 'tr.total td,tfoot td{border-top:1.6px solid #333!important;background:#eeeeee!important;font-weight:700}'
+  + 'tr.month td{background:#e9e6dc!important;border-top:1.4px solid #555!important}'
+  + 'thead{display:table-header-group}tr,td,th{break-inside:avoid;page-break-inside:avoid}'
+  + 'tr.month{break-after:avoid;page-break-after:avoid}'
+  + '.block-title,.print-section-title,.sec-title,h1,h2,h3,h4{break-after:avoid;page-break-after:avoid}'
+  + '.hdr,.combined-box,.summary,.v4-keep{break-inside:avoid;page-break-inside:avoid}'
+  + '.ft{display:none!important}.co-title.pagebreak{break-before:auto!important;page-break-before:auto!important;margin-top:20px}'
+  + '</style>'
+  + '<script>document.addEventListener("DOMContentLoaded",function(){'
+  + 'Array.prototype.forEach.call(document.querySelectorAll("table"),function(t){'
+  // a small table is never split; its heading stays with it
+  + 'if(t.rows.length>22)return;var h=t.previousElementSibling;'
+  + 'var w=document.createElement("div");w.className="v4-keep";t.parentNode.insertBefore(w,t);'
+  + 'if(h&&h.tagName!=="TABLE"&&(h.textContent||"").length<140){w.appendChild(h);}w.appendChild(t);});'
+  // a big table: keep its heading with the first rows
+  + 'Array.prototype.forEach.call(document.querySelectorAll("table"),function(t){var h=t.previousElementSibling;if(h&&!h.classList.contains("v4-keep")&&h.tagName!=="TABLE"&&(h.textContent||"").length<140){h.style.breakAfter="avoid";}});'
+  + '});<\/script>';
+function __v4PrintPatch(doc) {
+  var w0 = doc.write;
+  doc.write = function (h) {
+    h = String(h);
+    if (h.indexOf('id="v4-print"') < 0 && /<\/head>/i.test(h) && /@page/.test(h)) h = h.replace(/<\/head>/i, V4_PRINT_CSS + '</head>');
+    return w0.apply(this, [h].concat([].slice.call(arguments, 1)));
+  };
+}
+window.__v4PrintPatch = __v4PrintPatch;
+(function () {
+  var open0 = window.open;
+  window.open = function () {
+    var w = open0.apply(window, arguments);
+    try { if (w && w.document) __v4PrintPatch(w.document); } catch (e) {}
+    return w;
+  };
+})();
 
 // ── INIT ──
 applyTheme();
@@ -9329,13 +10101,13 @@ if(checkSession()){
 </div>
 
 <!-- REVIEW UNCHECKED LOANS MODAL &#x2014; surfaces every Main Loan/PC/PAD entry not
-     confirmed against this week's bank statement, so nothing lingers silently
+     confirmed against the latest bank statement, so nothing lingers silently
      once it's actually been paid off and dropped from the bank's sheet -->
 <div class="modal-overlay" id="m-review-unchecked">
   <div class="modal" style="width:680px;max-height:80vh">
     <div class="mh"><h2>Review Unchecked Loans</h2><button class="mcl" onclick="cm('m-review-unchecked')">&#x2715;</button></div>
     <p style="font-size:12px;color:var(--tx2);margin-bottom:14px">
-      These loans have not been confirmed against this week's bank statement. For each: if it's still active, mark it verified. If it no longer appears on the bank's sheet, it's been paid off &#x2014; remove it.
+      These loans have not been confirmed against the latest bank statement. For each: if it's still active, mark it verified. If it no longer appears on the bank's sheet, it's been paid off &#x2014; remove it.
     </p>
     <div id="review-unchecked-list" style="max-height:50vh;overflow-y:auto;border:1px solid var(--bdr);border-radius:var(--r);"></div>
     <div class="mft">
@@ -9349,7 +10121,7 @@ if(checkSession()){
   <div class="modal" style="width:680px;max-height:80vh">
     <div class="mh"><h2>Review Unchecked FDRs</h2><button class="mcl" onclick="cm('m-review-unchecked-fdr')">&#x2715;</button></div>
     <p style="font-size:12px;color:var(--tx2);margin-bottom:14px">
-      These FDRs have not been confirmed against this week's bank statement. For each: if it's still active, mark it verified. If it's been closed/matured out, remove it.
+      These FDRs have not been confirmed against the latest bank statement. For each: if it's still active, mark it verified. If it's been closed/matured out, remove it.
     </p>
     <div id="review-unchecked-fdr-list" style="max-height:50vh;overflow-y:auto;border:1px solid var(--bdr);border-radius:var(--r);"></div>
     <div class="mft">
@@ -9537,6 +10309,15 @@ if(checkSession()){
       <div style="font-size:11.5px;color:var(--tx3)">The document goes back to the normal list and can be accepted. This stays in the Activity log.</div>
     </div>
     <div class="mft"><button class="btn bg" onclick="cm('m-stop-resolve')">Cancel</button><button class="btn bp" id="sr-go" onclick="svResolveStop()">Dispute resolved</button></div>
+  </div>
+</div>
+
+<!-- release 4: shared modal (edit rows, bond weight, LC timeline, calendar day) -->
+<div class="modal-overlay" id="m-v4">
+  <div class="modal" id="v4-m-box" style="width:min(560px,96vw);max-height:92vh;overflow:auto">
+    <div class="mh"><h2 id="v4-m-title"></h2><button class="mcl" onclick="cm('m-v4')">&#x2715;</button></div>
+    <div class="mb" id="v4-m-body"></div>
+    <div class="mft"><button class="btn bg" onclick="cm('m-v4')">Close</button><button class="btn bp" id="v4-m-go" onclick="v4Go()">Save</button></div>
   </div>
 </div>
 
