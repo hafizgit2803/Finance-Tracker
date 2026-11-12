@@ -706,7 +706,12 @@ table.bond-t input{background:var(--bg3);border:1px solid var(--bdr);color:var(-
 #page-loans td,#page-fdr td{white-space:nowrap}
 #page-loans td input.v4-amt,#page-fdr td input.v4-amt{width:11em!important;display:inline-block}
 .v4-sym,#page-creditors span[id^="cred-sym-"],#page-liability td.r>span:first-child{font-size:16px!important;font-weight:600;color:var(--tx2)!important}
-.v4-words{font-size:12.5px;font-weight:600;color:var(--tx2);margin-top:5px;line-height:1.35;max-width:300px}
+.v4-words{font-size:22px;font-weight:600;color:var(--tx2);margin-top:6px;line-height:1.25}
+.v4-cobar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
+.v4-cobar .lb{font-size:12px;color:var(--tx3);margin-right:4px}
+.v4-cobar .c{padding:6px 13px;border-radius:99px;border:1px solid var(--bdr2);font-size:12.5px;color:var(--tx2);background:var(--bg2);cursor:pointer;font-family:inherit}
+.v4-cobar .c.on{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:600}
+.bstrip .v4-words{font-size:15px;line-height:1.3;margin-top:4px}
 
 </style>
 </head>
@@ -2414,7 +2419,7 @@ async function navigate(pg,pid) {
   // left a completely blank screen.
   if (isCom() && pg !== 'banking') { pg = 'banking'; pid = 'opened'; }
   if (isCom() && pg === 'banking') pid = 'opened';
-  if ((pg === 'dashboard' || pg === 'party') && !cashLCUnlocked && !isAdmin()) {
+  if ((pg === 'dashboard' || pg === 'party') && !cashLCUnlocked && !isAdmin() && !isMD()) {
     var pinOk = await checkPin('cash');
     if (!pinOk) return;
     cashLCUnlocked = true;
@@ -9710,15 +9715,24 @@ var V4_PRINT_CSS = '<style id="v4-print">'
   + '.block-title,.print-section-title,.sec-title,h1,h2,h3,h4{break-after:avoid;page-break-after:avoid}'
   + '.hdr,.combined-box,.summary,.v4-keep{break-inside:avoid;page-break-inside:avoid}'
   + '.ft{display:none!important}.co-title.pagebreak{break-before:auto!important;page-break-before:auto!important;margin-top:20px}'
+  // margins that survive the browser's "Margins: None": a page frame of spacer rows, used only when the page has no margin
+  + 'table.v4-pg{width:100%;border:0!important;border-collapse:collapse!important;margin:0!important}'
+  + '.v4-pg>thead>tr>td,.v4-pg>tfoot>tr>td,.v4-pg>tbody>tr>td{border:0!important;padding:0!important;background:none!important;font-size:inherit!important;color:inherit!important}'
+  + '.v4-pg>tbody>tr,.v4-pg>tbody>tr>td{break-inside:auto!important;page-break-inside:auto!important}'
+  + '.v4-pg>thead{display:table-header-group}.v4-pg>tfoot{display:table-footer-group}.v4-sp{height:0}'
+  + '@media print and (orientation:portrait) and (min-width:200mm),print and (orientation:landscape) and (min-width:285mm){body{padding:0 14mm!important}.v4-sp{height:13mm}}'
   + '</style>'
   + '<script>document.addEventListener("DOMContentLoaded",function(){'
-  + 'Array.prototype.forEach.call(document.querySelectorAll("table"),function(t){'
+  + 'var b=document.body,pg=document.createElement("table");pg.className="v4-pg";'
+  + 'pg.innerHTML="<thead><tr><td><div class=\\"v4-sp\\"></div></td></tr></thead><tfoot><tr><td><div class=\\"v4-sp\\"></div></td></tr></tfoot><tbody><tr><td></td></tr></tbody>";'
+  + 'var cell=pg.tBodies[0].rows[0].cells[0];while(b.firstChild){cell.appendChild(b.firstChild);}b.appendChild(pg);'
+  + 'Array.prototype.forEach.call(document.querySelectorAll("table:not(.v4-pg)"),function(t){'
   // a small table is never split; its heading stays with it
   + 'if(t.rows.length>22)return;var h=t.previousElementSibling;'
   + 'var w=document.createElement("div");w.className="v4-keep";t.parentNode.insertBefore(w,t);'
   + 'if(h&&h.tagName!=="TABLE"&&(h.textContent||"").length<140){w.appendChild(h);}w.appendChild(t);});'
   // a big table: keep its heading with the first rows
-  + 'Array.prototype.forEach.call(document.querySelectorAll("table"),function(t){var h=t.previousElementSibling;if(h&&!h.classList.contains("v4-keep")&&h.tagName!=="TABLE"&&(h.textContent||"").length<140){h.style.breakAfter="avoid";}});'
+  + 'Array.prototype.forEach.call(document.querySelectorAll("table:not(.v4-pg)"),function(t){var h=t.previousElementSibling;if(h&&!h.classList.contains("v4-keep")&&h.tagName!=="TABLE"&&(h.textContent||"").length<140){h.style.breakAfter="avoid";}});'
   + '});<\/script>';
 function __v4PrintPatch(doc) {
   var w0 = doc.write;
@@ -9736,6 +9750,45 @@ window.__v4PrintPatch = __v4PrintPatch;
     try { if (w && w.document) __v4PrintPatch(w.document); } catch (e) {}
     return w;
   };
+})();
+
+// ── 10. Company filter on the Banking pages (all companies together by default) ──
+var V4CO = '', V4CO_ON = false;
+(function () {
+  function keep(lcId) { if (!V4CO_ON || !V4CO) return true; var l = lcOf(lcId); return !!l && String(l.company || '') === V4CO; }
+  var aD = window.allDocs, oI = window.openedLcIds, hI = window.historyLcIds;
+  if (typeof aD === 'function') window.allDocs = function () { var r = aD.apply(this, arguments); return V4CO_ON && V4CO ? r.filter(function (d) { return keep(d.bankLcId); }) : r; };
+  if (typeof oI === 'function') window.openedLcIds = function () { var r = oI.apply(this, arguments); return V4CO_ON && V4CO ? r.filter(keep) : r; };
+  if (typeof hI === 'function') window.historyLcIds = function () { var r = hI.apply(this, arguments); return V4CO_ON && V4CO ? r.filter(keep) : r; };
+  ['renderOpenedLCs', 'renderAtBank', 'renderAcceptedBills', 'renderHistory', 'renderCalendar'].forEach(function (n) {
+    var f = window[n]; if (typeof f !== 'function') return;
+    window[n] = function () { var was = V4CO_ON; V4CO_ON = true; try { return f.apply(this, arguments); } finally { V4CO_ON = was; } };
+  });
+})();
+function v4Companies() {
+  var seen = {}; try { Object.keys(FIN.state.lcs).forEach(function (id) { var c = String(FIN.state.lcs[id].company || '').trim(); if (c) seen[c] = 1; }); } catch (e) {}
+  return Object.keys(seen).sort();
+}
+function v4CoBar() {
+  var pg = document.getElementById('page-banking'); if (!pg) return;
+  var bar = document.getElementById('v4-cobar'), cos = v4Companies();
+  if (cos.length < 2) { if (bar) bar.style.display = 'none'; V4CO = ''; return; }
+  if (V4CO && cos.indexOf(V4CO) < 0) V4CO = '';
+  if (!bar) { bar = document.createElement('div'); bar.id = 'v4-cobar'; bar.className = 'v4-cobar no-print'; var ph = pg.querySelector('.ph'); ph.parentNode.insertBefore(bar, ph.nextSibling); }
+  bar.style.display = '';
+  bar.innerHTML = '<span class="lb">Company</span>' + ['All together'].concat(cos).map(function (c, i) {
+    var val = i ? c : '';
+    return '<button type="button" class="c' + (V4CO === val ? ' on' : '') + '" data-co="' + esc(val) + '">' + esc(c) + '</button>';
+  }).join('');
+}
+document.addEventListener('click', function (e) {
+  var b = e.target && e.target.closest ? e.target.closest('#v4-cobar .c') : null; if (!b) return;
+  V4CO = b.getAttribute('data-co') || ''; v4CoBar();
+  try { renderBankingPage(); } catch (x) {}
+});
+(function () {
+  var f = window.renderBankingPage; if (typeof f !== 'function') return;
+  window.renderBankingPage = function () { v4CoBar(); return f.apply(this, arguments); };
 })();
 
 // ── INIT ──
